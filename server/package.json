@@ -1,0 +1,17 @@
+{
+  "name": "recipe_gen",
+  "version": "1.0.0",
+  "description": "AI-powered Recipe Generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "CS 3300 Group 8",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.1",
+    "joi": "^17.13.3",
+    "recipe_gen": "file:"
+  }
+}
