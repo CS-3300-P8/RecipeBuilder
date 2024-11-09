@@ -4,6 +4,8 @@
   "description": "AI-powered Recipe Generator",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "CS 3300 Group 8",
@@ -13,5 +15,8 @@
     "express": "^4.21.1",
     "joi": "^17.13.3",
     "recipe_gen": "file:"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
