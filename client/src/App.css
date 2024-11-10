@@ -1,0 +1,66 @@
+/* App.css */
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.App-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #282c34;
+}
+
+.App-header nav {
+  flex: 1;
+}
+
+.App-header nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.App-header nav ul li {
+  margin: 0 15px;
+}
+
+.App-header nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+}
+
+.auth-status {
+  color: white;
+  font-size: 18px;
+  margin-left: 20px;
+}
+
+.logout-button {
+  background-color: #ff4b5c;
+  border: none;
+  color: white;
+  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #ff1f3a;
+}
+
+main {
+  padding: 20px;
+}
