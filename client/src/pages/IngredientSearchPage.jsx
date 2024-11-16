@@ -107,31 +107,48 @@ const IngredientSearchPage = () => {
     }
   };
 
-  // Enhanced result item component
-  const ResultItem = ({ item }) => (
-    <div
-      className={`result-item ${item.isMain ? "main-result" : ""} ${
-        item.isRecommendation ? "recommendation" : ""
-      }`}
-    >
-      <div>
-        <h3>{item.name}</h3>
-        <p>{item.category}</p>
-        {item.isRecommendation && (
-          <span className="recommendation-tag">Similar ingredient</span>
-        )}
-      </div>
-      <button
-        className="add-button"
-        onClick={() => {
-          // Add to virtual pantry logic here
-          console.log(`Adding ${item.name} to pantry`);
-        }}
+  const ResultItem = ({ item }) => {
+    const handleAddItem = async () => {
+      try {
+        // Make a POST request to save the item to the backend
+        const response = await fetch("http://localhost:3001/api/store_ingredient", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: item.name,
+            category: item.category,
+          }),
+        });
+  
+        if (response.ok) {
+          console.log(`Item ${item.name} added successfully.`);
+        } else {
+          console.error("Failed to save item.");
+        }
+      } catch (error) {
+        console.error("Error adding item:", error);
+      }
+    };
+  
+    return (
+      <div
+        className={`result-item ${item.isMain ? "main-result" : ""} ${
+          item.isRecommendation ? "recommendation" : ""
+        }`}
       >
-        Add
-      </button>
-    </div>
-  );
+        <div>
+          <h3>{item.name}</h3>
+          <p>{item.category}</p>
+          {item.isRecommendation && (
+            <span className="recommendation-tag">Similar ingredient</span>
+          )}
+        </div>
+        <button className="add-button" onClick={handleAddItem}>
+          Add
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="search-page">

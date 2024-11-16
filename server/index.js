@@ -3,36 +3,21 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 var path = require('path');
+var cors = require('cors');
 
-// Create application/x-www-form-urlencoded parser
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+app.use(express.json());
+app.use(cors());
 
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname,"index.html"));
- })
 
- //temp location of static assets
- app.use(express.static('public'));
+app.post('/api/store_ingredient', function (req, res) {
+   const { name, category } = req.body;
 
- app.get('/process_get', function (req, res) {
-    // Prepare output in JSON format
-    response = {
-       first_name:req.query.first_name,
-       last_name:req.query.last_name
-    };
-    console.log(response);
-    res.end(JSON.stringify(response));
- })
+   // Add logic to store the item (for now, log to console or save to mock storage)
+   console.log("Ingredient saved:", { name, category });
 
- app.post('/process_post', urlencodedParser, function (req, res) {
-    // Prepare output in JSON format
-    response = {
-       first_name:req.body.first_name,
-       last_name:req.body.last_name
-    };
-    console.log(response);
-    res.end(JSON.stringify(response));
- })
+   res.status(200).send("Item saved successfully.");
+});
+
 
 //creates the web server
 var server = app.listen(3001, function () {
