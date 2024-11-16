@@ -8,31 +8,31 @@ var path = require('path');
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname,"index.html"));
- })
+    res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
+});
 
- //temp location of static assets
- app.use(express.static('public'));
+// points to client build folder. must build client to serve it!
+app.use(express.static(path.join(__dirname, "..", "client", "dist")));
 
- app.get('/process_get', function (req, res) {
-    // Prepare output in JSON format
-    response = {
-       first_name:req.query.first_name,
-       last_name:req.query.last_name
-    };
-    console.log(response);
-    res.end(JSON.stringify(response));
- })
+// app.get('/process_get', function (req, res) {
+//    // Prepare output in JSON format
+//    response = {
+//       first_name:req.query.first_name,
+//       last_name:req.query.last_name
+//    };
+//    console.log(response);
+//    res.end(JSON.stringify(response));
+// })
 
- app.post('/process_post', urlencodedParser, function (req, res) {
-    // Prepare output in JSON format
-    response = {
-       first_name:req.body.first_name,
-       last_name:req.body.last_name
-    };
-    console.log(response);
-    res.end(JSON.stringify(response));
- })
+// app.post('/process_post', urlencodedParser, function (req, res) {
+//    // Prepare output in JSON format
+//    response = {
+//       first_name:req.body.first_name,
+//       last_name:req.body.last_name
+//    };
+//    console.log(response);
+//    res.end(JSON.stringify(response));
+// })
 
 //creates the web server
 var server = app.listen(3001, function () {
