@@ -7,6 +7,9 @@ const VirtualPantry = () => {
   const [ingredients, setIngredients] = useState([]); // Ingredients of the selected pantry
   const [newIngredientName, setNewIngredientName] = useState(""); // Input for new ingredient name
   const [newIngredientCategory, setNewIngredientCategory] = useState(""); // Input for new ingredient category
+  const [newPantryName, setNewPantryName] = useState(""); // Input for new Pantry name
+  const [newPantryCategory, setNewPantryCategory] = useState(""); // Input for new Pantry category
+
 
 // Fetch all pantries from the backend
 useEffect(() => {
@@ -106,6 +109,41 @@ const handlePantryChange = async (pantry) => {
     }
   };
 
+  // Add a new pantry
+  const handleAddPantry = async () => {
+    if (!newPantryName) {
+      alert("Please select a pantry and provide both name.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3001/api/create_pantry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pantryName: newPantryName,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add Pantry");
+      }
+
+      // Update the pantry list with the new pantry
+      setPantries((prevPantries) => [...prevPantries, newPantryName]);
+
+
+      // Clear input fields
+      setNewPantryName("");
+
+      console.log(`Pantry '${newPantryName}' added successfully.`);
+    } catch (error) {
+      console.error("Error adding Pantry:", error);
+    }
+  };
+
 return (
   <div>
     <h1>Pantry Page</h1>
@@ -128,6 +166,47 @@ return (
         ))}
       </select>
     </div>
+
+    {/* Input fields and button for adding a Pantry */}
+    <div style={{ marginTop: "20px" }}>
+      <h3 style={{ color: "#333" }}>Create a New Pantry</h3>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+        <input
+          type="text"
+          placeholder="Pantry Name"
+          value={newPantryName}
+          onChange={(e) => setNewPantryName(e.target.value)}
+          style={{
+            flex: "1",
+            padding: "10px",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            fontSize: "14px",
+          }}
+        />
+        <button
+          onClick={handleAddPantry}
+          style={{
+            backgroundColor: newPantryName ? "blue" : "gray",
+            color: "white",
+            padding: "10px 15px",
+            border: "none",
+            borderRadius: "4px",
+            fontSize: "14px",
+            cursor: newPantryName ? "pointer" : "not-allowed",
+          }}
+          disabled={!newPantryName}
+        >
+          Create Pantry
+        </button>
+      </div>
+      {!newPantryName && (
+        <p style={{ color: "red", fontSize: "12px" }}>
+          Please provide a name for the new pantry.
+        </p>
+      )}
+    </div>
+
 
     {/* Input fields and button for adding an ingredient */}
     {selectedPantry && (
