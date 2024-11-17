@@ -5,6 +5,8 @@ const VirtualPantry = () => {
   const [pantries, setPantries] = useState([]); // List of available pantries
   const [selectedPantry, setSelectedPantry] = useState(null); // Currently selected pantry
   const [ingredients, setIngredients] = useState([]); // Ingredients of the selected pantry
+  const [newIngredientName, setNewIngredientName] = useState(""); // Input for new ingredient name
+  const [newIngredientCategory, setNewIngredientCategory] = useState(""); // Input for new ingredient category
 
 // Fetch all pantries from the backend
 useEffect(() => {
@@ -64,6 +66,46 @@ const handlePantryChange = async (pantry) => {
     }
   };
 
+  // Add a new ingredient to the selected pantry
+  const handleAddIngredient = async () => {
+    if (!selectedPantry || !newIngredientName || !newIngredientCategory) {
+      alert("Please select a pantry and provide both name and category for the ingredient.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3001/api/store_ingredient", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pantryName: selectedPantry,
+          name: newIngredientName,
+          category: newIngredientCategory,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add ingredient");
+      }
+
+      // Update the local ingredient list with the new ingredient
+      setIngredients((prevIngredients) => [
+        ...prevIngredients,
+        { name: newIngredientName, category: newIngredientCategory },
+      ]);
+
+      // Clear input fields
+      setNewIngredientName("");
+      setNewIngredientCategory("");
+
+      console.log(`Ingredient '${newIngredientName}' added successfully.`);
+    } catch (error) {
+      console.error("Error adding ingredient:", error);
+    }
+  };
+
 return (
   <div>
     <h1>Pantry Page</h1>
@@ -86,6 +128,39 @@ return (
         ))}
       </select>
     </div>
+
+    {/* Input fields and button for adding an ingredient */}
+    {selectedPantry && (
+      <div>
+        <h3>Add an Ingredient to {selectedPantry}</h3>
+        <input
+          type="text"
+          placeholder="Ingredient Name"
+          value={newIngredientName}
+          onChange={(e) => setNewIngredientName(e.target.value)}
+          style={{ marginRight: "10px", padding: "5px" }}
+        />
+        <input
+          type="text"
+          placeholder="Category"
+          value={newIngredientCategory}
+          onChange={(e) => setNewIngredientCategory(e.target.value)}
+          style={{ marginRight: "10px", padding: "5px" }}
+        />
+        <button
+          onClick={handleAddIngredient}
+          style={{
+            backgroundColor: "green",
+            color: "white",
+            padding: "5px 10px",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Add Ingredient
+        </button>
+      </div>
+    )}
 
     {/* Display ingredients of the selected pantry */}
     <div>
