@@ -1,9 +1,10 @@
 import IngredientSearchPage from "./pages/IngredientSearchPage.jsx";
+import VirtualPantry from "./pages/VirtualPantry.jsx";
 
 function App() {
   return (
     <>
-      <IngredientSearchPage />
+      <VirtualPantry />
     </>
   );
 }

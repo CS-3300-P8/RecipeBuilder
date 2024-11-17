@@ -1,0 +1,51 @@
+.pantry-page {
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.dropdown-container {
+  width: 30%;
+  background-color: #f4f4f4;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+}
+
+.dropdown-container h2 {
+  margin-bottom: 20px;
+}
+
+.dropdown-container select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.ingredients-container {
+  width: 70%;
+  padding: 20px;
+}
+
+.ingredients-container h2 {
+  margin-bottom: 20px;
+}
+
+.ingredients-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.ingredients-container ul li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.ingredients-container ul li:last-child {
+  border-bottom: none;
+}
+
+.ingredients-container p {
+  color: #666;
+}
