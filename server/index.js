@@ -1,8 +1,10 @@
 var express = require('express');
 var app = express();
 var cors = require('cors');
+const path = require('path');
 
 // Middleware
+//app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
 app.use(express.json());
 app.use(cors());
 
@@ -10,6 +12,12 @@ app.use(cors());
 let pantries = {};
 
 let current_pantries;
+
+/*
+app.get('/', function (req, res) {
+   res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
+});
+*/
 
 // Initialize a pantry with default values
 const initPantry = () => {
