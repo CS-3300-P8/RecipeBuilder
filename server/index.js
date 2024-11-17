@@ -9,6 +9,8 @@ app.use(cors());
 // 2D vector to store pantries and their ingredients
 let pantries = {};
 
+let current_pantries;
+
 // Initialize a pantry with default values
 const initPantry = () => {
    pantries["Default Pantry"] = [
@@ -16,8 +18,36 @@ const initPantry = () => {
       { name: "Sugar", category: "Condiments" },
       { name: "Rice", category: "Grains" },
    ];
+   current_pantries = "Default Pantry"
    console.log("Default pantry initialized.");
 };
+
+// Endpoint to update the current pantry
+app.post('/api/current_pantry', (req, res) => {
+   const { pantryName } = req.body;
+
+   if (!pantryName) {
+      return res.status(400).send({ error: "Pantry name is required." });
+   }
+
+   if (!pantries[pantryName]) {
+      return res.status(404).send({ error: "Pantry not found." });
+   }
+
+   current_pantries = pantryName;
+   console.log(`Current pantry updated to '${pantryName}'.`);
+   res.status(200).send({ message: `Current pantry updated to '${pantryName}'.` });
+});
+
+// Endpoint to retrieve the current pantry and its ingredients
+app.get('/api/current_pantry', (req, res) => {
+   if (!current_pantries) {
+      return res.status(404).send({ error: "No current pantry set." });
+   }
+
+   const ingredients = pantries[current_pantries] || [];
+   res.status(200).json({ pantryName: current_pantries, ingredients });
+});
 
 // Endpoint to create a new pantry
 app.post('/api/create_pantry', (req, res) => {

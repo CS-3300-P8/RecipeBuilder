@@ -110,11 +110,26 @@ const IngredientSearchPage = () => {
   const ResultItem = ({ item }) => {
     const handleAddItem = async () => {
       try {
+
+        // Fetch the current pantry from the backend
+        const responseCurrentPantry = await fetch("http://localhost:3001/api/current_pantry");
+        if (!responseCurrentPantry.ok) {
+          throw new Error("Failed to fetch the current pantry");
+        }
+
+        const { pantryName } = await responseCurrentPantry.json();
+
+        if (!pantryName) {
+          alert("No current pantry is set. Please select a pantry first.");
+          return;
+        }
+
         // Make a POST request to save the item to the backend
         const response = await fetch("http://localhost:3001/api/store_ingredient", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            pantryName,
             name: item.name,
             category: item.category,
           }),

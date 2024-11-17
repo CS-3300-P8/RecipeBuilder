@@ -31,20 +31,37 @@ useEffect(() => {
 
 // Fetch ingredients of the selected pantry
 const handlePantryChange = async (pantry) => {
-  setSelectedPantry(pantry);
+  setSelectedPantry(pantry); // Update the selected pantry
 
   try {
+    // Fetch ingredients for the selected pantry
     const response = await fetch(`http://localhost:3001/api/pantries/${encodeURIComponent(pantry)}`);
     if (!response.ok) {
       throw new Error("Failed to fetch ingredients");
     }
     const data = await response.json();
     setIngredients(data); // Set the ingredients of the selected pantry
+
+    // Update the current pantry on the backend
+    const response2 = await fetch(`http://localhost:3001/api/current_pantry`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        pantryName: pantry, // Use the updated pantry name here
+      }),
+    });
+
+    if (!response2.ok) {
+      throw new Error("Failed to update current pantry");
+    }
   } catch (error) {
-    console.error("Error fetching ingredients:", error);
-    setIngredients([]);
+    console.error("Error fetching ingredients or updating current pantry:", error);
+    setIngredients([]); // Reset ingredients in case of an error
   }
 };
+
 
   // Delete an ingredient from the pantry
   const handleDeleteIngredient = async (ingredientName) => {
