@@ -114,7 +114,7 @@ app.post('/api/current_pantry', (req, res) => {
    }
 
    current_pantries = pantryName;
-   console.log(`Current pantry updated to '${pantryName}'.`);
+   //console.log(`Current pantry updated to '${pantryName}'.`);
    res.status(200).send({ message: `Current pantry updated to '${pantryName}'.` });
 });
 
@@ -141,7 +141,7 @@ app.post('/api/create_pantry', (req, res) => {
    }
 
    pantries[pantryName] = []; // Initialize an empty ingredient list
-   console.log(`Pantry '${pantryName}' created.`);
+   //console.log(`Pantry '${pantryName}' created.`);
    res.status(200).send({ message: `Pantry '${pantryName}' created successfully.` });
 });
 
@@ -158,7 +158,7 @@ app.post('/api/store_ingredient', (req, res) => {
    }
 
    pantries[pantryName].push({ name, category });
-   console.log(`Ingredient '${name}' added to pantry '${pantryName}'.`);
+   //console.log(`Ingredient '${name}' added to pantry '${pantryName}'.`);
    res.status(200).send({ message: `Ingredient '${name}' added successfully to pantry '${pantryName}'.` });
 });
 
@@ -179,7 +179,7 @@ app.delete('/api/pantries/:pantryName/ingredients/:ingredientName', (req, res) =
    }
 
    pantries[pantryName].splice(ingredientIndex, 1); // Remove the ingredient
-   console.log(`Ingredient '${ingredientName}' removed from pantry '${pantryName}'.`);
+   //console.log(`Ingredient '${ingredientName}' removed from pantry '${pantryName}'.`);
 
    res.status(200).send({ message: `Ingredient '${ingredientName}' deleted successfully.` });
 });
