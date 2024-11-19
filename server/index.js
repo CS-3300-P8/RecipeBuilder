@@ -2,9 +2,21 @@ var express = require('express');
 var app = express();
 var cors = require('cors');
 const path = require('path');
+const OpenAI = require("openai");
+const OpenAIServiceFactory = require('./openaiFactory');
+
+
+const openai = new OpenAI({
+   apiKey: "YOUR_API_KEY", // TODO: Add your OpenAI API key here
+   dangerouslyAllowBrowser: false,
+ });
+
+const openAIServiceFactory = new OpenAIServiceFactory(openai);
+
 
 // Middleware
-//app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
+// comment this first line in or out to pull from the build.
+app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
 app.use(express.json());
 app.use(cors());
 
@@ -13,6 +25,65 @@ let pantries = {};
 
 let current_pantries;
 
+// comment this line in or out to pull from the build.
+app.get('/', function (req, res) {
+   res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
+});
+
+// Update the normalize ingredient endpoint to use the factory
+app.get('/api/normalizeIngredient/:ingredientName', async (req, res) => {
+   const query = req.params.ingredientName.trim();
+ 
+   if (!query) {
+     return res.status(400).send({ error: "Must query a real ingredient." });
+   }
+ 
+   try {
+     const service = openAIServiceFactory.createService('normalize', {
+       ingredientName: query
+     });
+     
+     const result = await service.execute();
+     return res.status(200).json(JSON.parse(result));
+   } catch (e) {
+     console.error("OpenAI API error:", e);
+     res.status(400).send({ error: e.message });
+   }
+ });
+
+// Add the new recipe generation endpoint
+app.post('/api/generate-recipe', async (req, res) => {
+   console.log(req.body);
+   const { ingredients, dietaryRestrictions, difficulty } = req.body;
+ 
+   if (!ingredients || !Array.isArray(ingredients)) {
+     return res.status(400).send({ error: "Invalid ingredients list" });
+   }
+
+   console.log("Inside app.post in index.js");
+   console.log(ingredients);
+   console.log(dietaryRestrictions); 
+   console.log(difficulty);
+ 
+   try {
+     const service = openAIServiceFactory.createService('recipe', {
+       ingredients,
+       dietaryRestrictions,
+       difficulty
+     });
+     
+     const result = await service.execute();
+     return res.status(200).json(JSON.parse(result));
+   } catch (e) {
+     console.error("OpenAI API error:", e);
+     res.status(400).send({ error: e.message });
+   }
+ });
+
+// Create the web server
+var server = app.listen(3001, function () {
+   console.log("Express App running at http://127.0.0.1:3001/");
+});
 /*
 app.get('/', function (req, res) {
    res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
@@ -141,6 +212,6 @@ app.get('/api/pantryNames', (req, res) => {
 initPantry();
 
 // Create the web server
-var server = app.listen(3001, function () {
-   console.log("Express App running at http://127.0.0.1:3001/");
-});
+// var server = app.listen(3001, function () {
+//    console.log("Express App running at http://127.0.0.1:3001/");
+// });
