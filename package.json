@@ -3,6 +3,7 @@
     "openapi": "^1.0.1"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "concurrently": "^9.1.0",
+    "jest": "^29.7.0"
   }
 }
