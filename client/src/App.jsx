@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import IngredientSearchPage from "./pages/IngredientSearchPage.jsx";
 import VirtualPantry from "./pages/VirtualPantry.jsx";
+import RecipeGeneratorPage from "./pages/RecipeGeneratorPage.jsx";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Routes>
           <Route path="/" element={<VirtualPantry />} />
           <Route path="/ingredient-search" element={<IngredientSearchPage />} />
+          <Route path="/recipe-generator" element={<RecipeGeneratorPage />} />
         </Routes>
       </div>
     </Router>
