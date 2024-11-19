@@ -61,7 +61,7 @@ class OpenAIService {
   
     async execute() {
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
