@@ -39,7 +39,7 @@ class OpenAIService {
           },
           {
             role: "user",
-            content: `Normalize this ingredient: "${query}"`,
+            content: `Normalize this ingredient: "${this.ingredientName}"`,  // 
           },
         ],
         temperature: 0.3,

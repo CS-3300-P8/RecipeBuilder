@@ -19,8 +19,9 @@ const IngredientSearchPage = () => {
       if (!response.ok) {
         throw new Error("Failed to normalize ingredient");
       }
-
-      return JSON.parse(await response.json());
+      const data = await response.json();
+      console.log(data);
+      return data;
     } catch (error) {
       console.error("Error:", error);
     }
@@ -152,7 +153,7 @@ const IngredientSearchPage = () => {
             placeholder="Search ingredients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSearch(searchQuery)}
+            onKeyUp={(e) => e.key === "Enter" && handleSearch(searchQuery)}
           />
           <button
             onClick={() => handleSearch(searchQuery)}
