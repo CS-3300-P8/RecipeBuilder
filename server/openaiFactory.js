@@ -61,7 +61,7 @@ class OpenAIService {
   
     async execute() {
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4-turbo-preview",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
@@ -106,6 +106,7 @@ class OpenAIService {
     }
   
     createService(type, params) {
+      console.log("OpenAIServiceFactory.createService", type, params);
       switch (type) {
         case 'normalize':
           return new IngredientNormalizationService(this.openai, params.ingredientName);

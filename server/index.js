@@ -7,7 +7,7 @@ const OpenAIServiceFactory = require('./openaiFactory');
 
 
 const openai = new OpenAI({
-   apiKey: "KEY_HERE",
+   apiKey: "YOUR_API_KEY", // TODO: Add your OpenAI API key here
    dangerouslyAllowBrowser: false,
  });
 

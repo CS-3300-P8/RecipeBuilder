@@ -24,13 +24,16 @@ function App() {
           <Link to="/ingredient-search" style={{ textDecoration: "none", color: "blue" }}>
             Ingredient Search
           </Link>
+          <Link to="/generate-recipe" style={{ textDecoration: "none", color: "blue" }}>
+            Generate Recipe
+          </Link>
         </nav>
 
         {/* Define Routes */}
         <Routes>
           <Route path="/" element={<VirtualPantry />} />
           <Route path="/ingredient-search" element={<IngredientSearchPage />} />
-          <Route path="/recipe-generator" element={<RecipeGeneratorPage />} />
+          <Route path="/generate-recipe" element={<RecipeGeneratorPage />} />
         </Routes>
       </div>
     </Router>

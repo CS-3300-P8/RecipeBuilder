@@ -32,7 +32,10 @@ const IngredientSearchPage = () => {
     setIsLoading(true);
     try {
       const normalizedData = await normalizeIngredient(query);
-      console.log(typeof normalizedData);
+
+      if (!normalizedData || !normalizedData.normalizedName) {
+        throw new Error('Invalid response from API');
+      }
 
       // Create results array with normalized ingredient and similar ingredients
       const results = [
