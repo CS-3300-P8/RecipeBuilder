@@ -61,7 +61,7 @@ class OpenAIService {
   
     async execute() {
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
@@ -79,20 +79,24 @@ class OpenAIService {
               "instructions": ["step1", "step2"],
               "prepTime": "X minutes",
               "cookingTime": "Y minutes",
-              "difficulty": "easy/medium/hard",
+              "difficulty": "${this.difficulty}",
               "servings": "Z"
-            }`
+            }
+            Ensure all ingredients listed are either in availableIngredients or missingIngredients.
+            Make the recipe complexity match the specified difficulty level.
+            Follow any dietary restrictions specified.`
           },
           {
             role: "user",
             content: `Generate a recipe with these parameters:
-            Available ingredients: ${JSON.stringify(this.ingredients)}
+            Available ingredients: ${this.ingredients.join(', ')}
             Dietary restrictions: ${this.dietaryRestrictions}
             Difficulty level: ${this.difficulty}`
           }
         ],
         temperature: 0.7,
-        max_tokens: 800
+        max_tokens: 1000,
+        response_format: { type: "json_object" }
       });
   
       return completion.choices[0].message.content;

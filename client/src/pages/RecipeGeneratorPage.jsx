@@ -35,6 +35,9 @@ function RecipeGeneratorPage() {
       if (!currentPantry?.ingredients) {
         throw new Error('No ingredients available in pantry');
       }
+      console.log(currentPantry.ingredients);
+      console.log(dietaryRestrictions);
+      console.log(difficulty);
 
       const response = await fetch('http://localhost:3001/api/generate-recipe', {
         method: 'POST',
