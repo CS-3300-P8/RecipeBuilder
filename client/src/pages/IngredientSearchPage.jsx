@@ -1,12 +1,6 @@
 // IngredientSearchPage.jsx
 import React, { useState } from "react";
-import OpenAI from "openai";
 import "./ingredientSearchPage.css";
-
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_REACT_APP_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
-});
 
 const IngredientSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,39 +15,14 @@ const IngredientSearchPage = () => {
 
   const normalizeIngredient = async (query) => {
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: `You are a helpful assistant that normalizes ingredient names and provides category information. 
-            For the given ingredient, provide:
-            1. The normalized ingredient name
-            2. Its category (e.g., Vegetables, Fruits, Proteins, Dairy, etc.)
-            3. 2-3 similar ingredients
-            
-            Format your response as JSON with the following structure:
-            {
-              "normalizedName": "standard ingredient name",
-              "category": "ingredient category",
-              "similarIngredients": ["similar1", "similar2", "similar3"]
-            }
-            
-            Keep responses concise and focused on common cooking ingredients.`,
-          },
-          {
-            role: "user",
-            content: `Normalize this ingredient: "${query}"`,
-          },
-        ],
-        temperature: 0.3,
-        max_tokens: 150,
-      });
+      const response = await fetch(`http://localhost:3001/api/normalizeIngredient/${query}`);
+      if (!response.ok) {
+        throw new Error("Failed to normalize ingredient");
+      }
 
-      return JSON.parse(completion.choices[0].message.content);
+      return JSON.parse(await response.json());
     } catch (error) {
-      console.error("OpenAI API error:", error);
-      throw error;
+      console.error("Error:", error);
     }
   };
 
@@ -63,6 +32,7 @@ const IngredientSearchPage = () => {
     setIsLoading(true);
     try {
       const normalizedData = await normalizeIngredient(query);
+      console.log(typeof normalizedData);
 
       // Create results array with normalized ingredient and similar ingredients
       const results = [
