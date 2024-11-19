@@ -42,10 +42,12 @@ This web application allows users to input ingredients they have at home and rec
 To run the project:
 
 1. **Install Dependencies**  
-   Ensure you have Node.js installed. Navigate to both the `client` and `server` directories, and run the following command in each to install the necessary dependencies:  
+   Ensure you have Node.js installed. Navigate to both the `client` and `server` directories, and run the following command in each to install the necessary dependencies:
+
    ```bash
    npm install
    ```
+
    ```bash
    npm install express
    ```
@@ -53,26 +55,33 @@ To run the project:
 2. **Start Development Servers**  
    After installing dependencies, start the development servers:
    In the server directory, run:
-   
+
    ```bash
    npm run dev
    ```
 
    In the client directory, run:
+
    ```bash
    npm run dev
    ```
 
 3. **Set Up API Key**  
    The client application requires an OpenAI API key to function. In the IngredientSearchPage.jsx file, ensure the apiKey is set to your personal OpenAI token on this line:
+
    ```bash
    apiKey: import.meta.env.VITE_REACT_APP_OPENAI_API_KEY,
    ```
+
    Replace import.meta.env.VITE_REACT_APP_OPENAI_API_KEY with your actual API key if not using environment variables.
-   
+
    Note: The client will display a blank page until a valid API key is provided.
 
+4. **Run Tests**
 
+```bash
+npm run test:e2e
+```
 
 ---
 
