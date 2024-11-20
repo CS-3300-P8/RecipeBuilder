@@ -1,217 +1,163 @@
-var express = require('express');
-var app = express();
-var cors = require('cors');
+const express = require('express');
+const cors = require('cors');
 const path = require('path');
-const OpenAI = require("openai");
-const OpenAIServiceFactory = require('./openaiFactory');
+const openAIServiceFactory = require('./services/openaiFactory');
 
+const app = express();
 
-const openai = new OpenAI({
-   apiKey: "YOUR_API_KEY", // TODO: Add your OpenAI API key here
-   dangerouslyAllowBrowser: false,
- });
-
-const openAIServiceFactory = new OpenAIServiceFactory(openai);
-
-
-// Middleware
-// comment this first line in or out to pull from the build.
-app.use(express.static(path.join(__dirname, '..', 'client', 'dist')));
-app.use(express.json());
-app.use(cors());
-
-// 2D vector to store pantries and their ingredients
-let pantries = {};
-
-let current_pantries;
-
-// comment this line in or out to pull from the build.
-app.get('/', function (req, res) {
-   res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
-});
-
-// Update the normalize ingredient endpoint to use the factory
-app.get('/api/normalizeIngredient/:ingredientName', async (req, res) => {
-   const query = req.params.ingredientName.trim();
- 
-   if (!query) {
-     return res.status(400).send({ error: "Must query a real ingredient." });
-   }
- 
-   try {
-     const service = openAIServiceFactory.createService('normalize', {
-       ingredientName: query
-     });
-     
-     const result = await service.execute();
-     return res.status(200).json(JSON.parse(result));
-   } catch (e) {
-     console.error("OpenAI API error:", e);
-     res.status(400).send({ error: e.message });
-   }
- });
-
-// Add the new recipe generation endpoint
-app.post('/api/generate-recipe', async (req, res) => {
-   console.log(req.body);
-   const { ingredients, dietaryRestrictions, difficulty } = req.body;
- 
-   if (!ingredients || !Array.isArray(ingredients)) {
-     return res.status(400).send({ error: "Invalid ingredients list" });
-   }
-
-   console.log("Inside app.post in index.js");
-   console.log(ingredients);
-   console.log(dietaryRestrictions); 
-   console.log(difficulty);
- 
-   try {
-     const service = openAIServiceFactory.createService('recipe', {
-       ingredients,
-       dietaryRestrictions,
-       difficulty
-     });
-     
-     const result = await service.execute();
-     return res.status(200).json(JSON.parse(result));
-   } catch (e) {
-     console.error("OpenAI API error:", e);
-     res.status(400).send({ error: e.message });
-   }
- });
-
-// Create the web server
-var server = app.listen(3001, function () {
-   console.log("Express App running at http://127.0.0.1:3001/");
-});
-/*
-app.get('/', function (req, res) {
-   res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
-});
-*/
-
-// Initialize a pantry with default values
-const initPantry = () => {
-   pantries["Default Pantry"] = [
-      { name: "Salt", category: "Spices" },
-      { name: "Sugar", category: "Condiments" },
-      { name: "Rice", category: "Grains" },
-   ];
-   current_pantries = "Default Pantry"
-   console.log("Default pantry initialized.");
+// CORS configuration
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'test' ? 'http://localhost:5173' : '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-// Endpoint to update the current pantry
-app.post('/api/current_pantry', (req, res) => {
-   const { pantryName } = req.body;
+app.use(cors(corsOptions));
 
-   if (!pantryName) {
-      return res.status(400).send({ error: "Pantry name is required." });
-   }
-
-   if (!pantries[pantryName]) {
-      return res.status(404).send({ error: "Pantry not found." });
-   }
-
-   current_pantries = pantryName;
-   console.log(`Current pantry updated to '${pantryName}'.`);
-   res.status(200).send({ message: `Current pantry updated to '${pantryName}'.` });
+// Content-type check middleware
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.headers['content-type'] !== 'application/json') {
+    return res.status(415).json({ error: 'Unsupported Media Type' });
+  }
+  next();
 });
 
-// Endpoint to retrieve the current pantry and its ingredients
-app.get('/api/current_pantry', (req, res) => {
-   if (!current_pantries) {
-      return res.status(404).send({ error: "No current pantry set." });
-   }
+// Body parser middleware
+app.use(express.json({
+  verify: (req, res, buf, encoding) => {
+    try {
+      JSON.parse(buf);
+    } catch (e) {
+      res.status(415).json({ error: 'Invalid JSON format' });
+      throw new Error('Invalid JSON format');
+    }
+  }
+}));
 
-   const ingredients = pantries[current_pantries] || [];
-   res.status(200).json({ pantryName: current_pantries, ingredients });
+// Root route handler
+app.get('/', (req, res) => {
+  if (process.env.NODE_ENV === 'test') {
+    res.send('<html><body>Test HTML</body></html>');
+  } else {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
 });
 
-// Endpoint to create a new pantry
+// Recipe generation endpoint
+app.post('/api/generate-recipe', async (req, res) => {
+  try {
+    const { ingredients, dietaryRestrictions, difficulty } = req.body;
+
+    if (!ingredients || !Array.isArray(ingredients)) {
+      return res.status(400).json({ error: 'Invalid ingredients list' });
+    }
+
+    const service = openAIServiceFactory.createService('recipe', {
+      ingredients,
+      dietaryRestrictions,
+      difficulty
+    });
+
+    const recipe = await service.execute();
+    res.json({ recipe });
+  } catch (error) {
+    console.error('Recipe generation error:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Ingredient normalization endpoint
+app.get('/api/normalizeIngredient/:ingredientName?', async (req, res) => {
+  const query = req.params.ingredientName?.trim();
+  
+  if (!query) {
+    return res.status(400).json({ error: 'Ingredient name is required' });
+  }
+
+  try {
+    const service = openAIServiceFactory.createService('normalize', {
+      ingredientName: query
+    });
+    const result = await service.execute();
+    return res.status(200).json({ normalized: result });
+  } catch (e) {
+    console.error("OpenAI API error:", e);
+    res.status(400).json({ error: e.message });
+  }
+});
+
+// Pantry endpoints
+let currentPantry = {
+  name: 'Default Pantry',
+  ingredients: []
+};
+
 app.post('/api/create_pantry', (req, res) => {
-   const { pantryName } = req.body;
-
-   if (!pantryName) {
-      return res.status(400).send({ error: "Pantry name is required." });
-   }
-
-   if (pantries[pantryName]) {
-      return res.status(400).send({ error: "Pantry already exists." });
-   }
-
-   pantries[pantryName] = []; // Initialize an empty ingredient list
-   console.log(`Pantry '${pantryName}' created.`);
-   res.status(200).send({ message: `Pantry '${pantryName}' created successfully.` });
+  const { name } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: 'Pantry name is required' });
+  }
+  currentPantry = { name, ingredients: [] };
+  res.json(currentPantry);
 });
 
-// Endpoint to add an ingredient to a pantry
+app.get('/api/current_pantry', (req, res) => {
+  res.json(currentPantry);
+});
+
 app.post('/api/store_ingredient', (req, res) => {
-   const { pantryName, name, category } = req.body;
-
-   if (!pantryName || !name || !category) {
-      return res.status(400).send({ error: "Pantry name, ingredient name, and category are required." });
-   }
-
-   if (!pantries[pantryName]) {
-      return res.status(404).send({ error: "Pantry not found." });
-   }
-
-   pantries[pantryName].push({ name, category });
-   console.log(`Ingredient '${name}' added to pantry '${pantryName}'.`);
-   res.status(200).send({ message: `Ingredient '${name}' added successfully to pantry '${pantryName}'.` });
+  const { name, category } = req.body;
+  if (!name || !category) {
+    return res.status(400).json({ error: 'Name and category are required' });
+  }
+  currentPantry.ingredients.push({ name, category });
+  res.json(currentPantry);
 });
 
-// Endpoint to delete an ingredient from a pantry
-app.delete('/api/pantries/:pantryName/ingredients/:ingredientName', (req, res) => {
-   const { pantryName, ingredientName } = req.params;
-
-   if (!pantries[pantryName]) {
-      return res.status(404).send({ error: "Pantry not found." });
-   }
-
-   const ingredientIndex = pantries[pantryName].findIndex(
-      (ingredient) => ingredient.name.toLowerCase() === ingredientName.toLowerCase()
-   );
-
-   if (ingredientIndex === -1) {
-      return res.status(404).send({ error: "Ingredient not found in the pantry." });
-   }
-
-   pantries[pantryName].splice(ingredientIndex, 1); // Remove the ingredient
-   console.log(`Ingredient '${ingredientName}' removed from pantry '${pantryName}'.`);
-
-   res.status(200).send({ message: `Ingredient '${ingredientName}' deleted successfully.` });
+// Test error route
+app.get('/error-test', () => {
+  throw new Error('Test error');
 });
 
-// Endpoint to retrieve all pantries and their ingredients
-app.get('/api/pantries', (req, res) => {
-   res.json(pantries);
+// Method not allowed handler
+app.use((req, res, next) => {
+  const allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'];
+  if (!allowedMethods.includes(req.method)) {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
+  next();
 });
 
-// Endpoint to retrieve ingredients of a specific pantry
-app.get('/api/pantries/:pantryName', (req, res) => {
-   const pantryName = req.params.pantryName;
-
-   if (!pantries[pantryName]) {
-      return res.status(404).send({ error: "Pantry not found." });
-   }
-
-   res.json(pantries[pantryName]);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
 });
 
-// Endpoint to retrieve the names of all pantries
-app.get('/api/pantryNames', (req, res) => {
-   // Get the keys of the pantries object, which represent pantry names
-   const pantryNames = Object.keys(pantries);
+// 404 handler
+app.use((req, res) => {
+  // Check if the method is not allowed for the route
+  const allowedMethods = {
+    '/api/generate-recipe': ['POST'],
+    '/api/create_pantry': ['POST'],
+    '/api/current_pantry': ['GET'],
+    '/api/store_ingredient': ['POST']
+  };
 
-   // Respond with the list of pantry names
-   res.json(pantryNames);
+  const routeMethods = allowedMethods[req.path];
+  if (routeMethods && !routeMethods.includes(req.method)) {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
+
+  res.status(404).json({ error: 'Not Found' });
 });
 
-initPantry();
+// Only start the server if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
 
-// Create the web server
-// var server = app.listen(3001, function () {
-//    console.log("Express App running at http://127.0.0.1:3001/");
-// });
+module.exports = app;

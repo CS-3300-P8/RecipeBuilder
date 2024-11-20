@@ -3,69 +3,74 @@ import "./VirtualPantry.css";
 
 const VirtualPantry = () => {
   const [pantries, setPantries] = useState([]); // List of available pantries
-  const [selectedPantry, setSelectedPantry] = useState(null); // Currently selected pantry
+  const [selectedPantry, setSelectedPantry] = useState(""); // Currently selected pantry
   const [ingredients, setIngredients] = useState([]); // Ingredients of the selected pantry
   const [newIngredientName, setNewIngredientName] = useState(""); // Input for new ingredient name
   const [newIngredientCategory, setNewIngredientCategory] = useState(""); // Input for new ingredient category
   const [newPantryName, setNewPantryName] = useState(""); // Input for new Pantry name
-  const [newPantryCategory, setNewPantryCategory] = useState(""); // Input for new Pantry category
+  const [error, setError] = useState(""); // Error state
 
+  // Fetch all pantries from the backend
+  useEffect(() => {
+    const fetchPantries = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/api/pantryNames");
+        if (!response.ok) {
+          throw new Error("Failed to fetch pantries");
+        }
+        const data = await response.json();
+        setPantries(data.pantries || []); // Ensure we have an array
+      } catch (error) {
+        console.error("Error fetching pantries:", error);
+        setError("Failed to fetch pantries");
+        setPantries([]); // Reset to empty array on error
+      }
+    };
 
-// Fetch all pantries from the backend
-useEffect(() => {
-  const fetchPantries = async () => {
+    fetchPantries();
+  }, []);
+
+  // Fetch ingredients of the selected pantry
+  const handlePantryChange = async (pantry) => {
+    setSelectedPantry(pantry);
+    setError(""); // Clear any previous errors
+    if (!pantry) return;
+
     try {
-      const response = await fetch("http://localhost:3001/api/pantryNames");
+      const response = await fetch(`http://localhost:3001/api/pantries/${encodeURIComponent(pantry)}`);
       if (!response.ok) {
-        throw new Error("Failed to fetch pantries");
+        throw new Error("Failed to fetch ingredients");
       }
       const data = await response.json();
-      setPantries(data); // Set the pantry names
+      setIngredients(data.ingredients || []); // Ensure we have an array
+
+      // Update the current pantry on the backend
+      const response2 = await fetch(`http://localhost:3001/api/current_pantry`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pantryName: pantry,
+        }),
+      });
+
+      if (!response2.ok) {
+        throw new Error("Failed to update current pantry");
+      }
     } catch (error) {
-      console.error("Error fetching pantries:", error);
+      console.error("Error:", error);
+      setError("Failed to fetch ingredients or update current pantry");
+      setIngredients([]); // Reset ingredients on error
     }
   };
 
-  fetchPantries();
-}, []);
-
-// Fetch ingredients of the selected pantry
-const handlePantryChange = async (pantry) => {
-  setSelectedPantry(pantry); // Update the selected pantry
-
-  try {
-    // Fetch ingredients for the selected pantry
-    const response = await fetch(`http://localhost:3001/api/pantries/${encodeURIComponent(pantry)}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch ingredients");
-    }
-    const data = await response.json();
-    setIngredients(data); // Set the ingredients of the selected pantry
-
-    // Update the current pantry on the backend
-    const response2 = await fetch(`http://localhost:3001/api/current_pantry`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        pantryName: pantry, // Use the updated pantry name here
-      }),
-    });
-
-    if (!response2.ok) {
-      throw new Error("Failed to update current pantry");
-    }
-  } catch (error) {
-    console.error("Error fetching ingredients or updating current pantry:", error);
-    setIngredients([]); // Reset ingredients in case of an error
-  }
-};
-
-
   // Delete an ingredient from the pantry
   const handleDeleteIngredient = async (ingredientName) => {
-    if (!selectedPantry) return;
+    if (!selectedPantry) {
+      setError("Please select a pantry first");
+      return;
+    }
 
     try {
       const response = await fetch(
@@ -76,20 +81,25 @@ const handlePantryChange = async (pantry) => {
         throw new Error("Failed to delete ingredient");
       }
 
-      // Remove the ingredient locally after successful deletion
       setIngredients((prevIngredients) =>
         prevIngredients.filter((ingredient) => ingredient.name !== ingredientName)
       );
-      console.log(`Ingredient '${ingredientName}' deleted successfully.`);
+      setError(""); // Clear any previous errors
     } catch (error) {
-      console.error("Error deleting ingredient:", error);
+      console.error("Error:", error);
+      setError("Failed to delete ingredient");
     }
   };
 
   // Add a new ingredient to the selected pantry
   const handleAddIngredient = async () => {
-    if (!selectedPantry || !newIngredientName || !newIngredientCategory) {
-      alert("Please select a pantry and provide both name and category for the ingredient.");
+    if (!selectedPantry) {
+      setError("Please select a pantry first");
+      return;
+    }
+
+    if (!newIngredientName || !newIngredientCategory) {
+      setError("Please provide both name and category for the ingredient");
       return;
     }
 
@@ -110,26 +120,24 @@ const handlePantryChange = async (pantry) => {
         throw new Error("Failed to add ingredient");
       }
 
-      // Update the local ingredient list with the new ingredient
       setIngredients((prevIngredients) => [
         ...prevIngredients,
         { name: newIngredientName, category: newIngredientCategory },
       ]);
 
-      // Clear input fields
       setNewIngredientName("");
       setNewIngredientCategory("");
-
-      console.log(`Ingredient '${newIngredientName}' added successfully.`);
+      setError(""); // Clear any previous errors
     } catch (error) {
-      console.error("Error adding ingredient:", error);
+      console.error("Error:", error);
+      setError("Failed to add ingredient");
     }
   };
 
   // Add a new pantry
   const handleAddPantry = async () => {
     if (!newPantryName) {
-      alert("Please select a pantry and provide both name.");
+      setError("Please provide a pantry name");
       return;
     }
 
@@ -148,149 +156,99 @@ const handlePantryChange = async (pantry) => {
         throw new Error("Failed to add Pantry");
       }
 
-      // Update the pantry list with the new pantry
       setPantries((prevPantries) => [...prevPantries, newPantryName]);
-
-
-      // Clear input fields
       setNewPantryName("");
-
-      console.log(`Pantry '${newPantryName}' added successfully.`);
+      setError(""); // Clear any previous errors
     } catch (error) {
-      console.error("Error adding Pantry:", error);
+      console.error("Error:", error);
+      setError("Failed to create pantry");
     }
   };
 
-return (
-  <div>
-    <h1>Pantry Page</h1>
+  return (
+    <div className="virtual-pantry">
+      <h1>Pantry Page</h1>
 
-    {/* Dropdown for selecting a pantry */}
-    <div>
-      <label htmlFor="pantry-select">Select a Pantry:</label>
-      <select
-        id="pantry-select"
-        onChange={(e) => handlePantryChange(e.target.value)}
-        value={selectedPantry || ""}
-      >
-        <option value="" disabled>
-          Choose a pantry
-        </option>
-        {pantries.map((pantry, index) => (
-          <option key={index} value={pantry}>
-            {pantry}
-          </option>
-        ))}
-      </select>
-    </div>
+      {error && <div className="error-message" role="alert">{error}</div>}
 
-    {/* Input fields and button for adding a Pantry */}
-    <div style={{ marginTop: "20px" }}>
-      <h3 style={{ color: "#333" }}>Create a New Pantry</h3>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-        <input
-          type="text"
-          placeholder="Pantry Name"
-          value={newPantryName}
-          onChange={(e) => setNewPantryName(e.target.value)}
-          style={{
-            flex: "1",
-            padding: "10px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            fontSize: "14px",
-          }}
-        />
-        <button
-          onClick={handleAddPantry}
-          style={{
-            backgroundColor: newPantryName ? "blue" : "gray",
-            color: "white",
-            padding: "10px 15px",
-            border: "none",
-            borderRadius: "4px",
-            fontSize: "14px",
-            cursor: newPantryName ? "pointer" : "not-allowed",
-          }}
-          disabled={!newPantryName}
+      {/* Dropdown for selecting a pantry */}
+      <div className="pantry-select">
+        <label htmlFor="pantry-select">Select a Pantry:</label>
+        <select
+          id="pantry-select"
+          data-testid="pantry-select"
+          onChange={(e) => handlePantryChange(e.target.value)}
+          value={selectedPantry}
         >
-          Create Pantry
-        </button>
+          <option value="">Choose a pantry</option>
+          {Array.isArray(pantries) && pantries.map((pantry, index) => (
+            <option key={index} value={pantry}>
+              {pantry}
+            </option>
+          ))}
+        </select>
       </div>
-      {!newPantryName && (
-        <p style={{ color: "red", fontSize: "12px" }}>
-          Please provide a name for the new pantry.
-        </p>
+
+      {/* Create new pantry section */}
+      <div className="create-pantry">
+        <h3>Create a New Pantry</h3>
+        <div className="input-group">
+          <input
+            type="text"
+            placeholder="Pantry Name"
+            value={newPantryName}
+            data-testid="new-pantry-input"
+            onChange={(e) => setNewPantryName(e.target.value)}
+          />
+          <button data-testid="create-pantry-button" onClick={handleAddPantry}>Create Pantry</button>
+        </div>
+      </div>
+
+      {/* Add new ingredient section */}
+      {selectedPantry && (
+        <div className="add-ingredient">
+          <h3>Add New Ingredient</h3>
+          <div className="input-group">
+            <input
+              type="text"
+              placeholder="Ingredient Name"
+              value={newIngredientName}
+              data-testid="ingredient-name-input"
+              onChange={(e) => setNewIngredientName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Category"
+              value={newIngredientCategory}
+              data-testid="ingredient-category-input"
+              onChange={(e) => setNewIngredientCategory(e.target.value)}
+            />
+            <button data-testid="add-ingredient-button" onClick={handleAddIngredient}>Add Ingredient</button>
+          </div>
+        </div>
       )}
-    </div>
 
-
-    {/* Input fields and button for adding an ingredient */}
-    {selectedPantry && (
-      <div>
-        <h3>Add an Ingredient to {selectedPantry}</h3>
-        <input
-          type="text"
-          placeholder="Ingredient Name"
-          value={newIngredientName}
-          onChange={(e) => setNewIngredientName(e.target.value)}
-          style={{ marginRight: "10px", padding: "5px" }}
-        />
-        <input
-          type="text"
-          placeholder="Category"
-          value={newIngredientCategory}
-          onChange={(e) => setNewIngredientCategory(e.target.value)}
-          style={{ marginRight: "10px", padding: "5px" }}
-        />
-        <button
-          onClick={handleAddIngredient}
-          style={{
-            backgroundColor: "green",
-            color: "white",
-            padding: "5px 10px",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Add Ingredient
-        </button>
-      </div>
-    )}
-
-    {/* Display ingredients of the selected pantry */}
-    <div>
-      <h2>{selectedPantry ? `${selectedPantry} Ingredients` : "Ingredients"}</h2>
-      {selectedPantry ? (
-        <ul>
-          {ingredients.length > 0 ? (
-              ingredients.map((ingredient, index) => (
-                <li key={index}>
-                  {`${ingredient.name} (${ingredient.category})`}
-                  <button
-                    onClick={() => handleDeleteIngredient(ingredient.name)}
-                    style={{
-                      marginLeft: "10px",
-                      backgroundColor: "red",
-                      color: "white",
-                      border: "none",
-                      padding: "5px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Delete
-                  </button>
-                </li>
-              ))
-            ) : (
-              <p>No ingredients found.</p>
-            )}
-          </ul>
-        ) : (
-          <p>Please select a pantry to view its ingredients.</p>
-        )}
-      </div>
+      {/* Display ingredients */}
+      {selectedPantry && ingredients.length > 0 && (
+        <div className="ingredients-list">
+          <h3>Ingredients in {selectedPantry}</h3>
+          <div className="ingredients-grid">
+            {ingredients.map((ingredient, index) => (
+              <div key={index} className="ingredient-item">
+                <span>{ingredient.name} ({ingredient.category})</span>
+                <button
+                  data-testid={`delete-ingredient-${index}`}
+                  onClick={() => handleDeleteIngredient(ingredient.name)}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
 export default VirtualPantry;
