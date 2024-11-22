@@ -217,11 +217,6 @@ return (
           Create Pantry
         </button>
       </div>
-      {!newPantryName && (
-        <p style={{ color: "red", fontSize: "12px" }}>
-          Please provide a name for the new pantry.
-        </p>
-      )}
     </div>
 
 
