@@ -157,6 +157,12 @@ app.post('/api/store_ingredient', (req, res) => {
       return res.status(404).send({ error: "Pantry not found." });
    }
 
+   if (pantries[pantryName].some((value) => {
+      return value.name.toLowerCase() == name.toLowerCase()
+   })) {
+      return res.status(200).send({ message: `Ingredient '${name}' already in pantry '${pantryName}` });
+   }
+
    pantries[pantryName].push({ name, category });
    console.log(`Ingredient '${name}' added to pantry '${pantryName}'.`);
    res.status(200).send({ message: `Ingredient '${name}' added successfully to pantry '${pantryName}'.` });
