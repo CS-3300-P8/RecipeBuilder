@@ -7,7 +7,7 @@ const OpenAIServiceFactory = require('./openaiFactory');
 
 
 const openai = new OpenAI({
-   apiKey: "YOUR_API_KEY", // TODO: Add your OpenAI API key here
+   apiKey: "YOUR_API_KEY",
    dangerouslyAllowBrowser: false,
  });
 
@@ -25,10 +25,14 @@ let pantries = {};
 
 let current_pantries;
 
-// comment this line in or out to pull from the build.
-app.get('/', function (req, res) {
-   res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
-});
+let DEV = true;
+
+if (DEV == false) {
+   // comment this line in or out to pull from the build.
+   app.get('/', function (req, res) {
+      res.sendFile(path.join(__dirname, "..", "client", "dist", "index.html"));
+   });
+}
 
 // Update the normalize ingredient endpoint to use the factory
 app.get('/api/normalizeIngredient/:ingredientName', async (req, res) => {
@@ -54,7 +58,7 @@ app.get('/api/normalizeIngredient/:ingredientName', async (req, res) => {
 // Add the new recipe generation endpoint
 app.post('/api/generate-recipe', async (req, res) => {
    console.log(req.body);
-   const { ingredients, dietaryRestrictions, difficulty } = req.body;
+   const { ingredients, dietaryRestrictions, style, difficulty } = req.body;
  
    if (!ingredients || !Array.isArray(ingredients)) {
      return res.status(400).send({ error: "Invalid ingredients list" });
@@ -63,12 +67,14 @@ app.post('/api/generate-recipe', async (req, res) => {
    console.log("Inside app.post in index.js");
    console.log(ingredients);
    console.log(dietaryRestrictions); 
+   console.log(style);
    console.log(difficulty);
  
    try {
      const service = openAIServiceFactory.createService('recipe', {
        ingredients,
        dietaryRestrictions,
+       style,
        difficulty
      });
      

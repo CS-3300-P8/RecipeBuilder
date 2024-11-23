@@ -8,6 +8,8 @@ function RecipeGeneratorPage() {
   const [error, setError] = useState(null);
   const [dietaryRestrictions, setDietaryRestrictions] = useState('none');
   const [difficulty, setDifficulty] = useState('medium');
+  const [style, setStyle] = useState('American');
+  const [types, setTypes] = useState('Dinner');
 
   useEffect(() => {
     fetchCurrentPantry();
@@ -37,6 +39,7 @@ function RecipeGeneratorPage() {
       }
       console.log(currentPantry.ingredients);
       console.log(dietaryRestrictions);
+      console.log(style);
       console.log(difficulty);
 
       const response = await fetch('http://localhost:3001/api/generate-recipe', {
@@ -47,6 +50,7 @@ function RecipeGeneratorPage() {
         body: JSON.stringify({
           ingredients: currentPantry.ingredients.map(ing => ing.name),
           dietaryRestrictions,
+          style,
           difficulty
         }),
       });
@@ -80,6 +84,7 @@ function RecipeGeneratorPage() {
       typeof data.name === 'string' &&
       typeof data.prepTime === 'string' &&
       typeof data.cookingTime === 'string' &&
+      typeof data.style === 'string' &&
       typeof data.difficulty === 'string' &&
       typeof data.servings === 'string';
   };
@@ -112,6 +117,22 @@ function RecipeGeneratorPage() {
               <option value="dairy-free">Dairy-free</option>
             </select>
           </div>
+
+          <div className="form-group">
+            <label className="form-label">Meal Style</label>
+            <select 
+              className="form-select"
+              value={style}
+              onChange={(e) => setStyle(e.target.value)}
+            >
+              <option value="American">American</option>
+              <option value="Cajun">Cajun</option>
+              <option value="Chinese">Chinese</option>
+              <option value="Italian">Italian</option>
+              <option value="Indian">Indian</option>
+            </select>
+          </div>
+
           
           <div className="form-group">
             <label className="form-label">Difficulty Level</label>
