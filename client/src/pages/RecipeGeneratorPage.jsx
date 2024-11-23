@@ -40,6 +40,7 @@ function RecipeGeneratorPage() {
       console.log(currentPantry.ingredients);
       console.log(dietaryRestrictions);
       console.log(style);
+      console.log(types);
       console.log(difficulty);
 
       const response = await fetch('http://localhost:3001/api/generate-recipe', {
@@ -51,6 +52,7 @@ function RecipeGeneratorPage() {
           ingredients: currentPantry.ingredients.map(ing => ing.name),
           dietaryRestrictions,
           style,
+          types,
           difficulty
         }),
       });
@@ -62,6 +64,9 @@ function RecipeGeneratorPage() {
       const data = await response.json();
       
       // Validate the recipe data structure
+      console.log(data);
+
+      
       if (!isValidRecipeData(data)) {
         throw new Error('Invalid recipe data received');
       }
@@ -85,6 +90,7 @@ function RecipeGeneratorPage() {
       typeof data.prepTime === 'string' &&
       typeof data.cookingTime === 'string' &&
       typeof data.style === 'string' &&
+      typeof data.types === 'string' &&
       typeof data.difficulty === 'string' &&
       typeof data.servings === 'string';
   };
@@ -130,6 +136,19 @@ function RecipeGeneratorPage() {
               <option value="Chinese">Chinese</option>
               <option value="Italian">Italian</option>
               <option value="Indian">Indian</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Type of Meal</label>
+            <select 
+              className="form-select"
+              value={types}
+              onChange={(e) => setTypes(e.target.value)}
+            >
+              <option value="Breakfast">Breakfast</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Dinner">Dinner</option>
             </select>
           </div>
 

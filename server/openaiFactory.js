@@ -52,11 +52,12 @@ class OpenAIService {
   
   // Concrete class for recipe generation
   class RecipeGenerationService extends OpenAIService {
-    constructor(openai, ingredients, dietaryRestrictions, style, difficulty) {
+    constructor(openai, ingredients, dietaryRestrictions, style, types, difficulty) {
       super(openai);
       this.ingredients = ingredients;
       this.dietaryRestrictions = dietaryRestrictions;
       this.style = style;
+      this.types = types;
       this.difficulty = difficulty;
     }
   
@@ -81,13 +82,15 @@ class OpenAIService {
               "prepTime": "X minutes",
               "cookingTime": "Y minutes",
               "style": "Style of Food",
+              "types": "Types of Food",
               "difficulty": "${this.difficulty}",
               "servings": "Z"
             }
             Ensure all ingredients listed are either in availableIngredients or missingIngredients.
             Make the recipe complexity match the specified difficulty level.
             Follow any dietary restrictions specified.
-            Example of style or Style of Meal is American, Cajun, or Italian Food`
+            Example of style (this.style) or Style of Meal is American, Cajun, or Italian Food. Ensure this recipe can be classified under this style.
+            The types (this.types) are Breakfast, Lunch, or Dinner. Ensure the recipe can be classified under this type`
           },
           {
             role: "user",
@@ -95,6 +98,7 @@ class OpenAIService {
             Available ingredients: ${this.ingredients.join(', ')}
             Dietary restrictions: ${this.dietaryRestrictions}
             Style of Food: ${this.style}
+            Type of Food: ${this.types}
             Difficulty level: ${this.difficulty}`
           }
         ],
@@ -124,6 +128,7 @@ class OpenAIService {
             params.ingredients,
             params.dietaryRestrictions,
             params.style,
+            params.types,
             params.difficulty
           );
         default:

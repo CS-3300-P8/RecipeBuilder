@@ -58,7 +58,7 @@ app.get('/api/normalizeIngredient/:ingredientName', async (req, res) => {
 // Add the new recipe generation endpoint
 app.post('/api/generate-recipe', async (req, res) => {
    console.log(req.body);
-   const { ingredients, dietaryRestrictions, style, difficulty } = req.body;
+   const { ingredients, dietaryRestrictions, style, type, difficulty } = req.body;
  
    if (!ingredients || !Array.isArray(ingredients)) {
      return res.status(400).send({ error: "Invalid ingredients list" });
@@ -68,6 +68,7 @@ app.post('/api/generate-recipe', async (req, res) => {
    console.log(ingredients);
    console.log(dietaryRestrictions); 
    console.log(style);
+   console.log(type);
    console.log(difficulty);
  
    try {
@@ -75,6 +76,7 @@ app.post('/api/generate-recipe', async (req, res) => {
        ingredients,
        dietaryRestrictions,
        style,
+       type,
        difficulty
      });
      
