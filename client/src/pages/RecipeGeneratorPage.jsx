@@ -27,6 +27,44 @@ function RecipeGeneratorPage() {
     }
   };
 
+  const addToPantry = async (ingredient) => {
+    try {
+       let curr_pantry = await fetch("http://localhost:3001/api/current_pantry");
+       if (!curr_pantry.ok)
+       {
+        throw new Error("Failed to fetch current pantry");
+       }
+
+       let {pantryName} = await curr_pantry.json();
+       
+       if (!pantryName) 
+       {
+        alert("No current Pantry set.");
+        return;
+       }
+
+       let rsp = await fetch("http://localhost:3001/api/store_ingredient", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pantryName,
+          name: ingredient,
+          category: ingredient
+        }),
+      });
+    
+      // Handle the response
+      if (rsp.ok) {
+        console.log(`Ingredient ${ingredient} added successfully.`);
+        // Optionally, update the state or UI to reflect the change
+      } else {
+        console.error(`Failed to add ingredient: ${ingredient}.`);
+      }
+    } catch (error) {
+      console.error("Error adding ingredient:", error);
+    }
+  };
+
   const generateRecipe = async () => {
     try {
       setLoading(true);
@@ -58,6 +96,9 @@ function RecipeGeneratorPage() {
       const data = await response.json();
       
       // Validate the recipe data structure
+      console.log(data);
+
+
       if (!isValidRecipeData(data)) {
         throw new Error('Invalid recipe data received');
       }
@@ -156,11 +197,19 @@ function RecipeGeneratorPage() {
               
               <div className="ingredients-category">
                 <h4 className="category-title missing">Need to Purchase:</h4>
-                <ul>
-                  {recipe.missingIngredients.map((ingredient, index) => (
-                    <li key={`missing-${index}`}>{ingredient}</li>
-                  ))}
-                </ul>
+                  <ul>
+                    {recipe.missingIngredients.map((ingredient, index) => (
+                      <li key={`missing-${index}`}>
+                        {ingredient}
+                        <button
+                          className="add-to-pantry-button"
+                          onClick={() => addToPantry(ingredient)}
+                        >
+                          Add
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
               </div>
             </div>
           </div>
