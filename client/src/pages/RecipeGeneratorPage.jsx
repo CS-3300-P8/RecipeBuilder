@@ -134,9 +134,7 @@ function RecipeGeneratorPage() {
   };
 
   return (
-    <div className="recipe-container">
-      <h1 className="recipe-title">Recipe Generator</h1>
-      
+    <div className="recipe-container">      
       {error && (
         <div className="error-message">
           {error}

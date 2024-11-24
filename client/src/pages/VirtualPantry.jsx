@@ -163,8 +163,6 @@ const handlePantryChange = async (pantry) => {
 
 return (
   <div>
-    <h1>Pantry Page</h1>
-
     {/* Dropdown for selecting a pantry */}
     <div>
       <label htmlFor="pantry-select">Select a Pantry:</label>
