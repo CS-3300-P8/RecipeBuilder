@@ -8,8 +8,10 @@ function RecipeGeneratorPage() {
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [dietaryRestrictions, setDietaryRestrictions] = useState("none");
-  const [difficulty, setDifficulty] = useState("medium");
+  const [dietaryRestrictions, setDietaryRestrictions] = useState('none');
+  const [difficulty, setDifficulty] = useState('medium');
+  const [style, setStyle] = useState('American');
+  const [types, setTypes] = useState('Dinner');
 
   useEffect(() => {
     fetchCurrentPantry();
@@ -79,6 +81,44 @@ function RecipeGeneratorPage() {
     }
   };
 
+  const addToPantry = async (ingredient) => {
+    try {
+       let curr_pantry = await fetch("http://localhost:3001/api/current_pantry");
+       if (!curr_pantry.ok)
+       {
+        throw new Error("Failed to fetch current pantry");
+       }
+
+       let {pantryName} = await curr_pantry.json();
+       
+       if (!pantryName) 
+       {
+        alert("No current Pantry set.");
+        return;
+       }
+
+       let rsp = await fetch("http://localhost:3001/api/store_ingredient", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pantryName,
+          name: ingredient,
+          category: ingredient
+        }),
+      });
+    
+      // Handle the response
+      if (rsp.ok) {
+        console.log(`Ingredient ${ingredient} added successfully.`);
+        // Optionally, update the state or UI to reflect the change
+      } else {
+        console.error(`Failed to add ingredient: ${ingredient}.`);
+      }
+    } catch (error) {
+      console.error("Error adding ingredient:", error);
+    }
+  };
+
   const generateRecipe = async () => {
     try {
       setLoading(true);
@@ -91,22 +131,23 @@ function RecipeGeneratorPage() {
       }
       console.log(currentPantry.ingredients);
       console.log(dietaryRestrictions);
+      console.log(style);
+      console.log(types);
       console.log(difficulty);
 
-      const response = await fetch(
-        "http://localhost:3001/api/generate-recipe",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ingredients: currentPantry.ingredients.map((ing) => ing.name),
-            dietaryRestrictions,
-            difficulty,
-          }),
-        }
-      );
+      const response = await fetch('http://localhost:3001/api/generate-recipe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ingredients: currentPantry.ingredients.map(ing => ing.name),
+          dietaryRestrictions,
+          style,
+          types,
+          difficulty
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to generate recipe");
@@ -115,6 +156,9 @@ function RecipeGeneratorPage() {
       const data = await response.json();
 
       // Validate the recipe data structure
+      console.log(data);
+
+      
       if (!isValidRecipeData(data)) {
         throw new Error("Invalid recipe data received");
       }
@@ -135,12 +179,14 @@ function RecipeGeneratorPage() {
       Array.isArray(data.availableIngredients) &&
       Array.isArray(data.missingIngredients) &&
       Array.isArray(data.instructions) &&
-      typeof data.name === "string" &&
-      typeof data.prepTime === "string" &&
-      typeof data.cookingTime === "string" &&
-      typeof data.difficulty === "string" &&
-      typeof data.servings === "string"
-    );
+      typeof data.name === 'string' &&
+      typeof data.prepTime === 'string' &&
+      typeof data.cookingTime === 'string' &&
+      typeof data.style === 'string' &&
+      typeof data.types === 'string' &&
+      typeof data.difficulty === 'string' &&
+      typeof data.servings === 'string'
+    )
   };
 
   return (
@@ -187,6 +233,35 @@ function RecipeGeneratorPage() {
           </div>
 
           <div className="form-group">
+            <label className="form-label">Meal Style</label>
+            <select 
+              className="form-select"
+              value={style}
+              onChange={(e) => setStyle(e.target.value)}
+            >
+              <option value="American">American</option>
+              <option value="Cajun">Cajun</option>
+              <option value="Chinese">Chinese</option>
+              <option value="Italian">Italian</option>
+              <option value="Indian">Indian</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Type of Meal</label>
+            <select 
+              className="form-select"
+              value={types}
+              onChange={(e) => setTypes(e.target.value)}
+            >
+              <option value="Breakfast">Breakfast</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Dinner">Dinner</option>
+            </select>
+          </div>
+
+          
+          <div className="form-group">
             <label className="form-label">Difficulty Level</label>
             <select
               className="form-select"
@@ -229,11 +304,19 @@ function RecipeGeneratorPage() {
 
               <div className="ingredients-category">
                 <h4 className="category-title missing">Need to Purchase:</h4>
-                <ul>
-                  {recipe.missingIngredients.map((ingredient, index) => (
-                    <li key={`missing-${index}`}>{ingredient}</li>
-                  ))}
-                </ul>
+                  <ul>
+                    {recipe.missingIngredients.map((ingredient, index) => (
+                      <li key={`missing-${index}`}>
+                        {ingredient}
+                        <button
+                          className="add-to-pantry-button"
+                          onClick={() => addToPantry(ingredient)}
+                        >
+                          Add
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
               </div>
             </div>
           </div>
