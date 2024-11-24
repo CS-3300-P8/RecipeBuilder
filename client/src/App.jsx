@@ -7,6 +7,7 @@ import RecipeGeneratorPage from "./pages/RecipeGeneratorPage.jsx";
 function App() {
   return (
     <Router>
+      <h1>Recipe Builder</h1>
       <div>
         {/* Navigation Menu */}
         <nav
@@ -18,13 +19,13 @@ function App() {
             borderBottom: "1px solid #ddd",
           }}
         >
-          <Link to="/" style={{ textDecoration: "none", color: "blue" }}>
+          <Link to="/">
             Virtual Pantry
           </Link>
-          <Link to="/ingredient-search" style={{ textDecoration: "none", color: "blue" }}>
+          <Link to="/ingredient-search">
             Ingredient Search
           </Link>
-          <Link to="/generate-recipe" style={{ textDecoration: "none", color: "blue" }}>
+          <Link to="/generate-recipe">
             Generate Recipe
           </Link>
         </nav>
