@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import './RecipeGeneratorPage.css';
+import React, { useState, useEffect } from "react";
+import "./RecipeGeneratorPage.css";
 
 function RecipeGeneratorPage() {
   const [currentPantry, setCurrentPantry] = useState(null);
+  const [pantryName, setPantryName] = useState(null);
+  const [pantries, setPantries] = useState([]);
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -13,19 +15,69 @@ function RecipeGeneratorPage() {
 
   useEffect(() => {
     fetchCurrentPantry();
+    fetchPantries();
   }, []);
 
   const fetchCurrentPantry = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/current_pantry');
+      const response = await fetch("http://localhost:3001/api/current_pantry");
       if (!response.ok) {
-        throw new Error('Failed to fetch pantry data');
+        throw new Error("Failed to fetch pantry data");
       }
       const data = await response.json();
       setCurrentPantry(data);
+      setPantryName(data["name"]);
     } catch (error) {
-      console.error('Error fetching pantry:', error);
-      setError('Failed to load pantry data. Please try again.');
+      console.error("Error fetching pantry:", error);
+      setError("Failed to load pantry data. Please try again.");
+    }
+  };
+
+  const fetchPantries = async () => {
+    try {
+      const response = await fetch("http://localhost:3001/api/pantryNames");
+      if (!response.ok) {
+        throw new Error("Failed to fetch pantries");
+      }
+      const data = await response.json();
+      setPantries(data); // Set the pantry names
+    } catch (error) {
+      console.error("Error fetching pantries:", error);
+    }
+  };
+
+  const switchPantry = async (pantry) => {
+
+    console.log(pantry);
+
+    try {
+      //  set on backend
+
+      const response = await fetch(`http://localhost:3001/api/current_pantry`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pantryName: pantry, // Use the updated pantry name here
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update current pantry");
+      }
+
+      const response2 = await fetch("http://localhost:3001/api/current_pantry");
+      if (!response2.ok) {
+        throw new Error("Failed to fetch pantry data");
+      }
+      const data = await response2.json();
+      console.log(data);
+      setCurrentPantry(data);
+      setPantryName(data["name"]);
+
+    } catch (error) {
+      console.error("Error updating current pantry:", error);
     }
   };
 
@@ -71,9 +123,11 @@ function RecipeGeneratorPage() {
     try {
       setLoading(true);
       setError(null);
-      
-      if (!currentPantry?.ingredients) {
-        throw new Error('No ingredients available in pantry');
+
+      console.log(currentPantry);
+
+      if (!currentPantry?.ingredients || currentPantry.ingredients.length < 1) {
+        throw new Error("No ingredients available in pantry");
       }
       console.log(currentPantry.ingredients);
       console.log(dietaryRestrictions);
@@ -96,23 +150,23 @@ function RecipeGeneratorPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate recipe');
+        throw new Error("Failed to generate recipe");
       }
 
       const data = await response.json();
-      
+
       // Validate the recipe data structure
       console.log(data);
 
       
       if (!isValidRecipeData(data)) {
-        throw new Error('Invalid recipe data received');
+        throw new Error("Invalid recipe data received");
       }
 
       setRecipe(data);
     } catch (error) {
-      console.error('Error generating recipe:', error);
-      setError(error.message || 'Failed to generate recipe. Please try again.');
+      console.error("Error generating recipe:", error);
+      setError(error.message || "Failed to generate recipe. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -120,7 +174,8 @@ function RecipeGeneratorPage() {
 
   // Helper function to validate recipe data structure
   const isValidRecipeData = (data) => {
-    return data &&
+    return (
+      data &&
       Array.isArray(data.availableIngredients) &&
       Array.isArray(data.missingIngredients) &&
       Array.isArray(data.instructions) &&
@@ -130,16 +185,33 @@ function RecipeGeneratorPage() {
       typeof data.style === 'string' &&
       typeof data.types === 'string' &&
       typeof data.difficulty === 'string' &&
-      typeof data.servings === 'string';
+      typeof data.servings === 'string'
+    )
   };
 
   return (
-    <div className="recipe-container">      
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
+    <div className="recipe-container">
+      <h1 className="recipe-title">Recipe Generator</h1>
+
+      {error && <div className="error-message">{error}</div>}
+
+      <div className="form-group">
+        
+        <select
+          className="form-select"
+          value={pantryName}
+          onChange={(e) => switchPantry(e.target.value)}
+        >
+          <option value="" disabled>
+            Choose a pantry
+          </option>
+          {pantries.map((pantry, index) => (
+            <option key={index} value={pantry}>
+              {pantry}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Preferences Card */}
       <div className="preferences-card">
@@ -147,7 +219,7 @@ function RecipeGeneratorPage() {
         <div className="form-grid">
           <div className="form-group">
             <label className="form-label">Dietary Restrictions</label>
-            <select 
+            <select
               className="form-select"
               value={dietaryRestrictions}
               onChange={(e) => setDietaryRestrictions(e.target.value)}
@@ -191,7 +263,7 @@ function RecipeGeneratorPage() {
           
           <div className="form-group">
             <label className="form-label">Difficulty Level</label>
-            <select 
+            <select
               className="form-select"
               value={difficulty}
               onChange={(e) => setDifficulty(e.target.value)}
@@ -201,13 +273,13 @@ function RecipeGeneratorPage() {
               <option value="hard">Hard</option>
             </select>
           </div>
-          
-          <button 
+
+          <button
             className="generate-button"
-            onClick={generateRecipe} 
+            onClick={generateRecipe}
             disabled={loading || !currentPantry}
           >
-            {loading ? 'Generating...' : 'Generate Recipe'}
+            {loading ? "Generating..." : "Generate Recipe"}
           </button>
         </div>
       </div>
@@ -216,7 +288,7 @@ function RecipeGeneratorPage() {
       {recipe && (
         <div className="recipe-card">
           <h2 className="recipe-name">{recipe.name}</h2>
-          
+
           {/* Ingredients Section */}
           <div className="ingredients-section">
             <h3 className="ingredients-title">Ingredients</h3>
@@ -229,7 +301,7 @@ function RecipeGeneratorPage() {
                   ))}
                 </ul>
               </div>
-              
+
               <div className="ingredients-category">
                 <h4 className="category-title missing">Need to Purchase:</h4>
                   <ul>
