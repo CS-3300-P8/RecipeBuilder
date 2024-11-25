@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
+    "dev": "nodemon --env-file=keys.env index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "CS 3300 Group 8",

@@ -24,13 +24,14 @@ let pantrySchema = new mongoose.Schema({
 
 const Pantry = mongoose.model('Pantry', pantrySchema);
 
+console.log(process.env);
 
-mongoose.connect("MONGOBD_URL", { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
    .then(() => console.log('Connected to MongoDB'))
    .catch(err => console.error('Could not connect to Server:', err))
 
 const openai = new OpenAI({
-   apiKey: "YOUR_API_KEY",
+   apiKey: process.env.OPENAI_API_KEY,
    dangerouslyAllowBrowser: false,
  });
 
