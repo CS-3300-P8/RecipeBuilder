@@ -242,8 +242,16 @@ function RecipeGeneratorPage() {
               <option value="American">American</option>
               <option value="Cajun">Cajun</option>
               <option value="Chinese">Chinese</option>
+              <option value="French">French</option>
+              <option value="Greek">Greek</option>
               <option value="Italian">Italian</option>
               <option value="Indian">Indian</option>
+              <option value="Korean">Korean</option>
+              <option value="Mexican">Mexican</option>
+              <option value="Spanish">Spanish</option>
+              <option value="Thai">Thai</option>
+              <option value="Turkish">Turkish</option>
+              <option value="Vietnamese">Vietnamese</option>
             </select>
           </div>
 
@@ -255,6 +263,7 @@ function RecipeGeneratorPage() {
               onChange={(e) => setTypes(e.target.value)}
             >
               <option value="Breakfast">Breakfast</option>
+              <option value="Brunch">Brunch</option>
               <option value="Lunch">Lunch</option>
               <option value="Dinner">Dinner</option>
             </select>
