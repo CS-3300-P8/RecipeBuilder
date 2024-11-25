@@ -42,7 +42,7 @@ function App() {
           <h1 style={{
             fontSize: '2rem',
             fontWeight: '700',
-            color: '#1F2937',
+            color: '#fdfbfa',
             marginBottom: '1rem',
             display: 'flex',
             alignItems: 'center',
