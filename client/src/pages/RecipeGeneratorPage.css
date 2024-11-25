@@ -100,6 +100,10 @@
   cursor: not-allowed;
 }
 
+.add-to-pantry-button {
+  margin-left: 15px; /* Adjust the value as needed */
+}
+
 /* Recipe Card Styles */
 .recipe-card {
   background-color: #ffffff;
@@ -166,6 +170,7 @@
   margin-top: 2rem;
   padding-top: 1rem;
   border-top: 1px solid #e2e8f0;
+  color: #4a5568;
 }
 
 .meta-item {
