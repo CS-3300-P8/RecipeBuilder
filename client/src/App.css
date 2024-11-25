@@ -64,3 +64,8 @@ body {
 main {
   padding: 20px;
 }
+
+&:hover {
+  color: #F97316;
+  background-color: #FFF7ED;
+}

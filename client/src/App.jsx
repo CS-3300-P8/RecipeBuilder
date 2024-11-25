@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, Suspense } from "react-router-dom";
 import IngredientSearchPage from "./pages/IngredientSearchPage.jsx";
 import VirtualPantry from "./pages/VirtualPantry.jsx";
 import RecipeGeneratorPage from "./pages/RecipeGeneratorPage.jsx";
@@ -19,7 +19,8 @@ function NavLink({ to, children }) {
         fontWeight: '500',
         backgroundColor: isActive ? '#FFF7ED' : 'transparent',
         transition: 'all 0.2s ease-in-out',
-      }}
+        cursor: 'pointer',
+      }}      
     >
       {children}
     </Link>
@@ -69,11 +70,13 @@ function App() {
           padding: '2rem',
           boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
         }}>
-          <Routes>
-            <Route path="/" element={<VirtualPantry />} />
-            <Route path="/ingredient-search" element={<IngredientSearchPage />} />
-            <Route path="/generate-recipe" element={<RecipeGeneratorPage />} />
-          </Routes>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Routes>
+              <Route path="/" element={<VirtualPantry />} />
+              <Route path="/ingredient-search" element={<IngredientSearchPage />} />
+              <Route path="/generate-recipe" element={<RecipeGeneratorPage />} />
+            </Routes>
+        </Suspense>
         </main>
       </div>
     </Router>
