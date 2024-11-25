@@ -1,4 +1,3 @@
-// IngredientSearchPage.jsx
 import React, { useState } from "react";
 import "./ingredientSearchPage.css";
 
@@ -12,15 +11,17 @@ const IngredientSearchPage = () => {
     "Rice",
     "Eggs",
   ]);
+  const [confirmationMessage, setConfirmationMessage] = useState(null);
 
   const normalizeIngredient = async (query) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/normalizeIngredient/${query}`);
+      const response = await fetch(
+        `http://localhost:3001/api/normalizeIngredient/${query}`
+      );
       if (!response.ok) {
         throw new Error("Failed to normalize ingredient");
       }
       const data = await response.json();
-      console.log(data);
       return data;
     } catch (error) {
       console.error("Error:", error);
@@ -35,10 +36,9 @@ const IngredientSearchPage = () => {
       const normalizedData = await normalizeIngredient(query);
 
       if (!normalizedData || !normalizedData.normalizedName) {
-        throw new Error('Invalid response from API');
+        throw new Error("Invalid response from API");
       }
 
-      // Create results array with normalized ingredient and similar ingredients
       const results = [
         {
           name: normalizedData.normalizedName,
@@ -54,12 +54,10 @@ const IngredientSearchPage = () => {
 
       setSearchResults(results);
 
-      // Update recent searches
       if (!recentSearches.includes(normalizedData.normalizedName)) {
         setRecentSearches((prev) =>
           [normalizedData.normalizedName, ...prev].slice(0, 5)
         );
-        // Save to localStorage for persistence
         localStorage.setItem(
           "recentSearches",
           JSON.stringify(
@@ -84,9 +82,9 @@ const IngredientSearchPage = () => {
   const ResultItem = ({ item }) => {
     const handleAddItem = async () => {
       try {
-
-        // Fetch the current pantry from the backend
-        const responseCurrentPantry = await fetch("http://localhost:3001/api/current_pantry");
+        const responseCurrentPantry = await fetch(
+          "http://localhost:3001/api/current_pantry"
+        );
         if (!responseCurrentPantry.ok) {
           throw new Error("Failed to fetch the current pantry");
         }
@@ -98,19 +96,27 @@ const IngredientSearchPage = () => {
           return;
         }
 
-        // Make a POST request to save the item to the backend
-        const response = await fetch("http://localhost:3001/api/store_ingredient", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            pantryName,
-            name: item.name,
-            category: item.category,
-          }),
-        });
-  
+        const response = await fetch(
+          "http://localhost:3001/api/store_ingredient",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pantryName,
+              name: item.name,
+              category: item.category,
+            }),
+          }
+        );
+
         if (response.ok) {
-          console.log(`Item ${item.name} added successfully.`);
+          // Show confirmation message
+          setConfirmationMessage(`${item.name} has been added to your pantry`);
+
+          // Clear the message after 3 seconds
+          setTimeout(() => {
+            setConfirmationMessage(null);
+          }, 10000);
         } else {
           console.error("Failed to save item.");
         }
@@ -118,7 +124,7 @@ const IngredientSearchPage = () => {
         console.error("Error adding item:", error);
       }
     };
-  
+
     return (
       <div
         className={`result-item ${item.isMain ? "main-result" : ""} ${
@@ -142,6 +148,16 @@ const IngredientSearchPage = () => {
   return (
     <div className="search-page">
       <div className="search-container">
+        {confirmationMessage && (
+          <div
+            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+            role="alert"
+          >
+            <strong className="font-bold">Success! </strong>
+            <span className="block sm:inline">{confirmationMessage}</span>
+          </div>
+        )}
+
         <div className="search-header">
           <h1>Find Ingredients</h1>
           <p>Search for ingredients to add to your virtual pantry</p>
