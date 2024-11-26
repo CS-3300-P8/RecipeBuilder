@@ -62,7 +62,7 @@ https://client-dot-round-office-437918-e3.ue.r.appspot.com/
 - **Frontend:** React.js
 - **Backend:** Node.js with Express
 - **Database:** MongoDB
-- **AI Tool:** TensorFlow (for AI-powered ingredient substitutions)
+- **AI Tool:** GPT-4o (for AI-powered ingredient substitutions)
 - **Version Control:** GitHub
 - **Deployment:** Google Cloud Platform (GCP)
 
@@ -82,7 +82,6 @@ The following libraries are required:
 
 - React.js
 - Express.js
-- TensorFlow.js
 
 ### **Download & Build Instructions**
 
@@ -118,9 +117,9 @@ npm install
      npm run dev
      ```
 2. Set up API Key:  
-   Add your OpenAI API key in the `.env` file under `client`:
+   Add your OpenAI API key in the `keys.env` file under `server`:
    ```bash
-   VITE_REACT_APP_OPENAI_API_KEY=your-key-here
+   OPENAI_API_KEY=your-key-here
    ```
 
 ---
@@ -131,7 +130,7 @@ npm install
 
 1. **Blank Screen in Client App**:
 
-   - Ensure the OpenAI API key is configured correctly in `.env`.
+   - Ensure the OpenAI API key is configured correctly in `keys.env`.
    - Restart the client after changes using:
      ```bash
      npm run dev
@@ -139,7 +138,7 @@ npm install
 
 2. **Server Crashing**:
 
-   - Confirm MongoDB is running locally or provide a valid connection string in the `.env` file.
+   - Confirm MongoDB is running locally or provide a valid connection string in the `keys.env` file.
 
 3. **Missing Dependencies**:
    - Reinstall dependencies with:
@@ -160,8 +159,8 @@ npm install
 ## **Design Patterns**
 
 - **Factory Pattern**: Dynamically creates recipe objects based on user input.
-- **Observer Pattern**: Notifies users when no exact recipe matches are found.
-- **Strategy Pattern**: Applies filters (e.g., dietary restrictions, cuisine type) to recipe searches.
+- **Command Pattern**: Modulates backend logic for reusability in future development.​
+- **Mediator Pattern**: Centralizes API calls for simplicity when altering backend​.
 
 ---
 
@@ -175,7 +174,7 @@ The project includes comprehensive testing:
 
 **AI-Specific Testing**
 
-- **Blackbox Testing**: Tests input/output behavior of AI-powered substitutions.
+- **Blackbox Testing**: Tests input/output behavior of AI-powered substitutions and pantry management/database operations.
 - **Whitebox Testing**: Debugs internal logic for substitutions using TensorFlow.
 
 ---
