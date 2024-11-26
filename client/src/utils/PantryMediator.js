@@ -95,6 +95,16 @@ class PantryMediator {
             throw new Error("Failed to add ingredient");
         }
     }
+
+    async deletePantry(pantry) {
+        const response = await fetch(
+            `${this.api_url}/api/pantries/${encodeURIComponent(pantry)}`,
+            { method: "DELETE" }
+        );
+        if (!response.ok) {
+            throw new Error("Failed to delete pantry");
+        }
+    }
 }
 
 instance = new PantryMediator(import.meta.env.VITE_API_URL);
