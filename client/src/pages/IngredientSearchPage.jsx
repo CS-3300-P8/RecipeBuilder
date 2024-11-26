@@ -1,26 +1,54 @@
-// IngredientSearchPage.jsx
-import React, { useState } from "react";
-import "./ingredientSearchPage.css";
+import React, { useState, useEffect } from "react";
+import "./IngredientSearchPage.css";
 
 const IngredientSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPantry, setCurrentPantry] = useState(null);
   const [recentSearches, setRecentSearches] = useState([
     "Tomatoes",
     "Chicken",
     "Rice",
     "Eggs",
   ]);
+  const [confirmationMessage, setConfirmationMessage] = useState(null);
+
+  // Fetch current pantry on component mount
+  useEffect(() => {
+    fetchCurrentPantry();
+  }, []);
+
+  const fetchCurrentPantry = async () => {
+    try {
+      const response = await fetch("http://localhost:3001/api/current_pantry");
+      if (!response.ok) {
+        if (response.status === 404) {
+          setCurrentPantry(null);
+          return;
+        }
+        throw new Error("Failed to fetch the current pantry");
+      }
+      const data = await response.json();
+      setCurrentPantry({
+        name: data.pantryName,
+        ingredients: data.ingredients,
+      });
+    } catch (error) {
+      console.error("Error fetching current pantry:", error);
+      setCurrentPantry(null);
+    }
+  };
 
   const normalizeIngredient = async (query) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/normalizeIngredient/${query}`);
+      const response = await fetch(
+        `http://localhost:3001/api/normalizeIngredient/${query}`
+      );
       if (!response.ok) {
         throw new Error("Failed to normalize ingredient");
       }
       const data = await response.json();
-      console.log(data);
       return data;
     } catch (error) {
       console.error("Error:", error);
@@ -35,10 +63,9 @@ const IngredientSearchPage = () => {
       const normalizedData = await normalizeIngredient(query);
 
       if (!normalizedData || !normalizedData.normalizedName) {
-        throw new Error('Invalid response from API');
+        throw new Error("Invalid response from API");
       }
 
-      // Create results array with normalized ingredient and similar ingredients
       const results = [
         {
           name: normalizedData.normalizedName,
@@ -54,12 +81,10 @@ const IngredientSearchPage = () => {
 
       setSearchResults(results);
 
-      // Update recent searches
       if (!recentSearches.includes(normalizedData.normalizedName)) {
         setRecentSearches((prev) =>
           [normalizedData.normalizedName, ...prev].slice(0, 5)
         );
-        // Save to localStorage for persistence
         localStorage.setItem(
           "recentSearches",
           JSON.stringify(
@@ -84,33 +109,34 @@ const IngredientSearchPage = () => {
   const ResultItem = ({ item }) => {
     const handleAddItem = async () => {
       try {
-
-        // Fetch the current pantry from the backend
-        const responseCurrentPantry = await fetch("http://localhost:3001/api/current_pantry");
-        if (!responseCurrentPantry.ok) {
-          throw new Error("Failed to fetch the current pantry");
-        }
-
-        const { pantryName } = await responseCurrentPantry.json();
-
-        if (!pantryName) {
+        if (!currentPantry?.name) {
           alert("No current pantry is set. Please select a pantry first.");
           return;
         }
 
-        // Make a POST request to save the item to the backend
-        const response = await fetch("http://localhost:3001/api/store_ingredient", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            pantryName,
-            name: item.name,
-            category: item.category,
-          }),
-        });
-  
+        const response = await fetch(
+          "http://localhost:3001/api/store_ingredient",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pantryName: currentPantry.name,
+              name: item.name,
+              category: item.category,
+            }),
+          }
+        );
+
         if (response.ok) {
-          console.log(`Item ${item.name} added successfully.`);
+          // Refresh the current pantry to get the updated ingredients
+          await fetchCurrentPantry();
+
+          setConfirmationMessage(
+            `${item.name} has been added to ${currentPantry.name}`
+          );
+          setTimeout(() => {
+            setConfirmationMessage(null);
+          }, 3000);
         } else {
           console.error("Failed to save item.");
         }
@@ -118,7 +144,12 @@ const IngredientSearchPage = () => {
         console.error("Error adding item:", error);
       }
     };
-  
+
+    // Check if the ingredient is already in the current pantry
+    const isIngredientInPantry = currentPantry?.ingredients?.some(
+      (ingredient) => ingredient.name.toLowerCase() === item.name.toLowerCase()
+    );
+
     return (
       <div
         className={`result-item ${item.isMain ? "main-result" : ""} ${
@@ -132,9 +163,13 @@ const IngredientSearchPage = () => {
             <span className="recommendation-tag">Similar ingredient</span>
           )}
         </div>
-        <button className="add-button" onClick={handleAddItem}>
-          Add
-        </button>
+        {isIngredientInPantry ? (
+          <span className="text-gray-500 italic">Already in pantry</span>
+        ) : (
+          <button className="add-button" onClick={handleAddItem}>
+            Add
+          </button>
+        )}
       </div>
     );
   };
@@ -142,6 +177,34 @@ const IngredientSearchPage = () => {
   return (
     <div className="search-page">
       <div className="search-container">
+        {/* Current Pantry Display */}
+        <div className="current-pantry-status bg-blue-100 border border-blue-400 text-blue-700 px-4 py-2 rounded mb-4">
+          <p className="text-lg">
+            {currentPantry ? (
+              <>
+                Currently adding to: <strong>{currentPantry.name}</strong>
+                <span className="text-sm ml-2">
+                  ({currentPantry.ingredients.length} ingredients)
+                </span>
+              </>
+            ) : (
+              <span className="text-orange-600">
+                No pantry selected. Please select a pantry first.
+              </span>
+            )}
+          </p>
+        </div>
+
+        {confirmationMessage && (
+          <div
+            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+            role="alert"
+          >
+            <strong className="font-bold">Success! </strong>
+            <span className="block sm:inline">{confirmationMessage}</span>
+          </div>
+        )}
+
         <div className="search-header">
           <h1>Find Ingredients</h1>
           <p>Search for ingredients to add to your virtual pantry</p>

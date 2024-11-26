@@ -103,6 +103,15 @@ function App() {
             <Route path="/generate-recipe" element={<RecipeGeneratorPage />} />
           </Routes>
         </main>
+        <footer style={{
+          marginTop: '2rem',
+          textAlign: 'center',
+          padding: '1rem 0',
+          fontSize: '0.875rem',
+          color: '#9CA3AF',
+        }}>
+          © {new Date().getFullYear()} Recipe Builder. All rights reserved.
+        </footer>
       </div>
     </Router>
   );
