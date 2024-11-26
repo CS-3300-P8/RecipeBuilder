@@ -6,6 +6,9 @@ const path = require("path");
 const OpenAI = require("openai");
 const OpenAIServiceFactory = require("./openaiFactory");
 
+const AddIngredientCommand = require("./commands/AddIngredientCommand");
+
+
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
 let pantrySchema = new mongoose.Schema({
@@ -41,6 +44,9 @@ const openai = new OpenAI({
 });
 
 const openAIServiceFactory = new OpenAIServiceFactory(openai);
+
+module.exports = {Pantry, openAIServiceFactory};
+
 
 // Middleware
 // comment this first line in or out to pull from the build.
@@ -207,6 +213,7 @@ app.post("/api/create_pantry", async (req, res) => {
 
 // Endpoint to add an ingredient to a pantry
 app.post("/api/store_ingredient", async (req, res) => {
+  console.log("Adding Ingredient");
   const { pantryName, name, category } = req.body;
 
   if (!pantryName || !name || !category) {
@@ -217,33 +224,18 @@ app.post("/api/store_ingredient", async (req, res) => {
       });
   }
 
-  let pantry = await Pantry.findOne({ PantryName: pantryName });
-
-  if (!pantry) {
-    return res.status(404).send({ error: "Pantry not found." });
-  }
-
-  let ingredients = pantry.ingredients.find(
-    (ingredient) => ingredient.name.toLowerCase() === name.toLowerCase()
-  );
-
-  if (ingredients) {
-    return res
-      .status(200)
-      .send({
-        message: `Ingredient '${name}' already in pantry '${pantryName}`,
-      });
-  }
-
-  pantry.ingredients.push({ name, category });
-  await pantry.save();
-
-  console.log(`Ingredient '${name}' added to pantry '${pantryName}'.`);
-  res
-    .status(200)
-    .send({
+  try {
+    const command = new AddIngredientCommand(Pantry, pantryName, { name, category });
+    const result = await command.execute();
+    console.log("DONE Adding Ingredient");
+    return res.status(200).send({
       message: `Ingredient '${name}' added successfully to pantry '${pantryName}'.`,
+      pantry: result,
     });
+  } catch (error) {
+    return res.status(400).send({ error: error.message });
+  }
+
 });
 
 // Endpoint to delete an ingredient from a pantry
