@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./ingredientSearchPage.css";
+import "./IngredientSearchPage.css";
 
 const IngredientSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
