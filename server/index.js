@@ -9,6 +9,7 @@ const OpenAIServiceFactory = require("./openaiFactory");
 const AddIngredientCommand = require("./commands/AddIngredientCommand");
 const UpdateCurrentPantryCommand = require("./commands/UpdateCurrentPantryCommand");
 const RetrieveCurrentPantryCommand = require("./commands/RetrieveCurrentPantryCommand");
+const CreatePantryCommand = require("./commands/CreatePantryCommand");
 
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
@@ -199,11 +200,9 @@ app.post("/api/create_pantry", async (req, res) => {
     return res.status(400).send({ error: "Pantry name is required." });
   }
 
-  if (await Pantry.findOne({ PantryName: pantryName })) {
-    return res.status(400).send({ error: "Pantry already exists." });
-  }
+  const command = new CreatePantryCommand(Pantry, pantryName);
+  await command.execute();
 
-  await Pantry.create({ PantryName: pantryName, ingredients: [] });
   console.log(`Pantry '${pantryName}' created.`);
   res
     .status(200)
