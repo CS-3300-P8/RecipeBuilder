@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import "./IngredientSearchPage.css";
+import "./ingredientSearchPage.css";
+import instance from "../utils/PantryMediator.js";
 
 const IngredientSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -114,32 +115,19 @@ const IngredientSearchPage = () => {
           return;
         }
 
-        const response = await fetch(
-          "http://localhost:3001/api/store_ingredient",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              pantryName: currentPantry.name,
-              name: item.name,
-              category: item.category,
-            }),
-          }
-        );
+        await instance.addIngredient(currentPantry.name, item["name"], item["category"]);
 
-        if (response.ok) {
+        setConfirmationMessage(`${item.name} has been added to your pantry`);
+
           // Refresh the current pantry to get the updated ingredients
-          await fetchCurrentPantry();
+        await fetchCurrentPantry();
 
-          setConfirmationMessage(
-            `${item.name} has been added to ${currentPantry.name}`
-          );
-          setTimeout(() => {
-            setConfirmationMessage(null);
-          }, 3000);
-        } else {
-          console.error("Failed to save item.");
-        }
+        setConfirmationMessage(
+          `${item.name} has been added to ${currentPantry.name}`
+        );
+        setTimeout(() => {
+          setConfirmationMessage(null);
+        }, 3000);
       } catch (error) {
         console.error("Error adding item:", error);
       }
