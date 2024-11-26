@@ -132,4 +132,5 @@ dist
 # DS_Store
 .DS_Store
 server/index copy.js
+server/keys.env
 client/src/.env.development

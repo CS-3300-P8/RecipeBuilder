@@ -1,7 +1,35 @@
----
 # **Recipe Finder with AI-Powered Ingredient Matching**
 
 This web application allows users to input ingredients they have at home and receive potential recipes that can be made. If all the ingredients are not available for an exact match, the system suggests "near" recipes and provides AI-powered ingredient substitutions.
+
+---
+
+## **Release Notes**
+
+### **New Features**
+
+- **Ingredient Input & Recipe Matching**: Users can input available ingredients and receive recipes with exact matches.
+- **AI-Powered Substitutions**: Automatically suggests replacements for missing ingredients.
+- **Near Recipe Suggestions**: Suggests recipes even when not all ingredients are available.
+- **Recipe Filtering**: Enables filtering by cuisine, dietary restrictions, and preparation time.
+
+### **Bug Fixes**
+
+- Fixed an issue where certain recipe matches returned incorrect results.
+- Resolved API timeout issues with the OpenAI integration.
+- Addressed a bug where recipe filtering did not apply properly to dietary restrictions.
+
+### **Known Bugs and Defects**
+
+- Some substitutions may not account for dietary restrictions.
+- Rare cases where duplicate "near" recipes are displayed.
+- Limited recipes for niche dietary requirements (e.g., keto).
+
+**Planned Improvements**:
+
+- Expand substitution database for more dietary-specific recommendations.
+- Implement user feedback for recipe accuracy.
+
 ---
 
 ## **Features**
@@ -39,48 +67,98 @@ This web application allows users to input ingredients they have at home and rec
 
 ## **Project Setup**
 
-To run the project:
+### **Prerequisites**
 
-1. **Install Dependencies**  
-   Ensure you have Node.js installed. Navigate to both the `client` and `server` directories, and run the following command in each to install the necessary dependencies:  
+- Node.js (v16 or higher)
+- npm (v8 or higher)
+- MongoDB server
+
+### **Dependencies**
+
+The following libraries are required:
+
+- React.js
+- Express.js
+- TensorFlow.js
+
+### **Download & Build Instructions**
+
+1. Clone the repository:
    ```bash
-   npm install
+   git clone https://github.com/your-repo/recipe-finder.git
    ```
+2. Navigate to the project directory:
    ```bash
-   npm install express
+   cd recipe-finder
    ```
 
-2. **Start Development Servers**  
-   After installing dependencies, start the development servers:
-   In the server directory, run:
-   
+### **Install Dependencies**
+
+Install required packages for both client and server:
+
+```bash
+cd client
+npm install
+cd ../server
+npm install
+```
+
+### **Application Installation & Run**
+
+1. Start the development servers:
+   - In the `server` directory:
+     ```bash
+     npm run dev
+     ```
+   - In the `client` directory:
+     ```bash
+     npm run dev
+     ```
+2. Set up API Key:  
+   Add your OpenAI API key in the `.env` file under `client`:
    ```bash
-   npm run dev
+   VITE_REACT_APP_OPENAI_API_KEY=your-key-here
    ```
 
-   In the client directory, run:
-   ```bash
-   npm run dev
-   ```
+---
 
-3. **Set Up API Key**  
-   The client application requires an OpenAI API key to function. In the IngredientSearchPage.jsx file, ensure the apiKey is set to your personal OpenAI token on this line:
-   ```bash
-   apiKey: import.meta.env.VITE_REACT_APP_OPENAI_API_KEY,
-   ```
-   Replace import.meta.env.VITE_REACT_APP_OPENAI_API_KEY with your actual API key if not using environment variables.
-   
-   Note: The client will display a blank page until a valid API key is provided.
+## **Troubleshooting**
 
+### **Common Issues & Solutions**
 
+1. **Blank Screen in Client App**:
+
+   - Ensure the OpenAI API key is configured correctly in `.env`.
+   - Restart the client after changes using:
+     ```bash
+     npm run dev
+     ```
+
+2. **Server Crashing**:
+
+   - Confirm MongoDB is running locally or provide a valid connection string in the `.env` file.
+
+3. **Missing Dependencies**:
+   - Reinstall dependencies with:
+     ```bash
+     npm install
+     ```
+
+### **FAQs**
+
+- **Q:** Can I use this without an OpenAI API key?  
+  **A:** No, the AI-powered substitution feature requires a valid API key.
+
+- **Q:** How can I report a bug?  
+  **A:** Open an issue on our GitHub repository.
 
 ---
 
 ## **Design Patterns**
 
-- **Factory Pattern:** Used to dynamically create recipe objects based on user input.
-- **Observer Pattern:** Notifies users when no exact recipe matches are found, prompting "near" recipes.
-- **Strategy Pattern:** Applies filters (e.g., dietary restrictions, cuisine type) to recipe searches.
+- **Factory Pattern**: Dynamically creates recipe objects based on user input.
+- **Observer Pattern**: Notifies users when no exact recipe matches are found.
+- **Strategy Pattern**: Applies filters (e.g., dietary restrictions, cuisine type) to recipe searches.
 
 ---
 
@@ -88,12 +166,14 @@ To run the project:
 
 The project includes comprehensive testing:
 
-- **Unit Testing:** For individual functions, using Jest and Mocha.
-- **Integration Testing:** Ensures frontend and backend work together, using Postman and Supertest.
-- **System Testing:** Verifies complete functionality, using Selenium for browser-based tests.
-- **AI Integration for Testing:**
-  - **Blackbox Testing:** Uses AI tools like Functionize to test user input/output behavior.
-  - **Whitebox Testing:** Tests internal logic, especially for AI-powered substitutions, using GitHub Copilot and TensorFlow debugging features.
+- **Unit Testing**: For individual functions, using Jest and Mocha.
+- **Integration Testing**: Ensures frontend and backend work together, using Postman and Supertest.
+- **System Testing**: Verifies complete functionality, using Selenium for browser-based tests.
+
+**AI-Specific Testing**
+
+- **Blackbox Testing**: Tests input/output behavior of AI-powered substitutions.
+- **Whitebox Testing**: Debugs internal logic for substitutions using TensorFlow.
 
 ---
 
@@ -111,5 +191,3 @@ The project includes comprehensive testing:
 ## **License**
 
 This project is licensed under the MIT License.
-
----
