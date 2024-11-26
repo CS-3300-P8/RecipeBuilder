@@ -233,17 +233,18 @@ function RecipeGeneratorPage() {
       }}
     >
       <section>
-        <h2
+        <Card>
+        <h1
           style={{
             fontSize: "1.5rem",
             fontWeight: "600",
             marginBottom: "1rem",
             color: "#1F2937",
+            textAlign: "center",
           }}
         >
           Recipe Generator
-        </h2>
-        <Card>
+        </h1>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
           >
