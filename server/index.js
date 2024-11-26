@@ -14,6 +14,8 @@ const DeleteIngredientCommand = require("./commands/DeleteIngredientCommand");
 const GetAllPantriesCommand = require("./commands/GetAllPantriesCommand");
 const GetIngredientsCommand = require("./commands/GetIngredientsCommand");
 
+const GetPantryNamesCommand = require("./commands/GetPantryNamesCommand");
+
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
@@ -288,11 +290,11 @@ app.get("/api/pantries/:pantryName", async (req, res) => {
   }
 });
 
-// Endpoint to retrieve the names of all pantries
 app.get("/api/pantryNames", async (req, res) => {
-  res.json(
-    (await Pantry.find({}, "PantryName")).map((pantry) => pantry.PantryName)
-  );
+  const command = new GetPantryNamesCommand(Pantry);
+  const pantryNames = await command.execute();
+
+  res.status(200).json(pantryNames);
 });
 
 initPantry();
