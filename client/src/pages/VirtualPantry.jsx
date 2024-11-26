@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./VirtualPantry.css";
+import instance from "../utils/PantryMediator.js";
 
 const VirtualPantry = () => {
   const [pantries, setPantries] = useState([]); // List of available pantries
@@ -14,26 +15,10 @@ const VirtualPantry = () => {
     const initializePantries = async () => {
       try {
         // Fetch all pantries
-        const pantriesResponse = await fetch(
-          "http://localhost:3001/api/pantryNames"
-        );
-        if (!pantriesResponse.ok) {
-          throw new Error("Failed to fetch pantries");
-        }
-        const pantriesData = await pantriesResponse.json();
-        setPantries(pantriesData);
+        setPantries(await instance.getPantryNames());
 
         // Fetch current pantry
-        const currentPantryResponse = await fetch(
-          "http://localhost:3001/api/current_pantry"
-        );
-        if (!currentPantryResponse.ok) {
-          if (currentPantryResponse.status !== 404) {
-            throw new Error("Failed to fetch current pantry");
-          }
-          return;
-        }
-        const currentPantryData = await currentPantryResponse.json();
+        const currentPantryData = await instance.getCurrentPantry();
 
         if (currentPantryData.pantryName) {
           setSelectedPantry(currentPantryData.pantryName);
@@ -52,32 +37,10 @@ const VirtualPantry = () => {
 
     try {
       // Fetch ingredients for the selected pantry
-      const response = await fetch(
-        `http://localhost:3001/api/pantries/${encodeURIComponent(pantry)}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch ingredients");
-      }
-      const data = await response.json();
-      setIngredients(data);
+      setIngredients(await instance.getIngredients(pantry));
 
       // Update the current pantry on the backend
-      const response2 = await fetch(
-        `http://localhost:3001/api/current_pantry`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            pantryName: pantry,
-          }),
-        }
-      );
-
-      if (!response2.ok) {
-        throw new Error("Failed to update current pantry");
-      }
+      await instance.setCurrentPantry(pantry);
     } catch (error) {
       console.error(
         "Error fetching ingredients or updating current pantry:",
@@ -91,15 +54,7 @@ const VirtualPantry = () => {
     if (!selectedPantry) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:3001/api/pantries/${encodeURIComponent(
-          selectedPantry
-        )}/ingredients/${encodeURIComponent(ingredientName)}`,
-        { method: "DELETE" }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to delete ingredient");
-      }
+      instance.deleteIngredient(selectedPantry, ingredientName);
 
       setIngredients((prevIngredients) =>
         prevIngredients.filter(
@@ -121,24 +76,7 @@ const VirtualPantry = () => {
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:3001/api/store_ingredient",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            pantryName: selectedPantry,
-            name: newIngredientName,
-            category: newIngredientCategory,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to add ingredient");
-      }
+      await instance.addIngredient(selectedPantry, newIngredientName, newIngredientCategory);
 
       setIngredients((prevIngredients) => [
         ...prevIngredients,
@@ -161,19 +99,7 @@ const VirtualPantry = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3001/api/create_pantry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          pantryName: newPantryName,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add Pantry");
-      }
+      await instance.addPantry(newPantryName);
 
       setPantries((prevPantries) => [...prevPantries, newPantryName]);
       setNewPantryName("");
@@ -204,7 +130,7 @@ const VirtualPantry = () => {
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <h3 style={{ color: "#333" }}>Create a New Pantry</h3>
+        <h3>Create a New Pantry</h3>
         <div
           style={{
             display: "flex",

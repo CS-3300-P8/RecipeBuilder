@@ -1,0 +1,12 @@
+runtime: nodejs18
+env: standard
+
+env_variables:
+  NODE_ENV: "production"
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always
+
+instance_class: F1
