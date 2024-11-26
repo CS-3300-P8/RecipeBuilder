@@ -1,0 +1,16 @@
+runtime: nodejs18
+service: default
+
+handlers:
+  # Serve static files
+  - url: /(.*\.(js|css|png|jpg|jpeg|gif|ico|json|svg))$
+    static_files: dist/\1
+    upload: dist/.*\.(js|css|png|jpg|jpeg|gif|ico|json|svg)$
+
+  # Serve index.html for all other routes (SPA)
+  - url: /.*
+    static_files: dist/index.html
+    upload: dist/index.html
+
+env_variables:
+  NODE_ENV: "production"

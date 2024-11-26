@@ -1,0 +1,15 @@
+# Client .dockerignore
+node_modules
+dist
+.git
+.gitignore
+.env
+.env.local
+README.md
+
+# Server .dockerignore
+node_modules
+.git
+.gitignore
+.env
+README.md
