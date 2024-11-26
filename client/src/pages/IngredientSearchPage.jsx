@@ -179,7 +179,7 @@ const IngredientSearchPage = () => {
       <div className="search-container">
         {/* Current Pantry Display */}
         <div className="current-pantry-status bg-blue-100 border border-blue-400 text-blue-700 px-4 py-2 rounded mb-4">
-          <p className="text-lg">
+          {/* <p className="text-lg">
             {currentPantry ? (
               <>
                 Currently adding to: <strong>{currentPantry.name}</strong>
@@ -192,7 +192,7 @@ const IngredientSearchPage = () => {
                 No pantry selected. Please select a pantry first.
               </span>
             )}
-          </p>
+          </p> */}
         </div>
 
         {confirmationMessage && (
@@ -208,6 +208,20 @@ const IngredientSearchPage = () => {
         <div className="search-header">
           <h1>Find Ingredients</h1>
           <p>Search for ingredients to add to your virtual pantry</p>
+          <p className="text-lg">
+            {currentPantry ? (
+              <>
+                Currently adding to: <strong>{currentPantry.name}</strong>
+                <span className="text-sm ml-2">
+                  ({currentPantry.ingredients.length} ingredients)
+                </span>
+              </>
+            ) : (
+              <span className="text-orange-600">
+                No pantry selected. Please select a pantry first.
+              </span>
+            )}
+          </p>
         </div>
 
         <div className="search-bar">
