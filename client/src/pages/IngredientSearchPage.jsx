@@ -206,7 +206,14 @@ const IngredientSearchPage = () => {
         )}
 
         <div className="search-header">
-          <h1>Find Ingredients</h1>
+          <h1
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "600",
+              marginBottom: "1rem",
+              color: "#1F2937",
+            }}
+          >Find Ingredients</h1>
           <p>Search for ingredients to add to your virtual pantry</p>
           <p className="text-lg">
             {currentPantry ? (
