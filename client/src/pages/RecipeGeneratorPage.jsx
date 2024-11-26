@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./RecipeGeneratorPage.css";
+import instance from "../utils/PantryMediator.js";
 
 function RecipeGeneratorPage() {
   const [currentPantry, setCurrentPantry] = useState(null);
@@ -20,11 +21,7 @@ function RecipeGeneratorPage() {
 
   const fetchCurrentPantry = async () => {
     try {
-      const response = await fetch("http://localhost:3001/api/current_pantry");
-      if (!response.ok) {
-        throw new Error("Failed to fetch pantry data");
-      }
-      const data = await response.json();
+      data = await instance.getCurrentPantry();
       setCurrentPantry(data);
       setPantryName(data["name"]);
     } catch (error) {
@@ -35,12 +32,7 @@ function RecipeGeneratorPage() {
 
   const fetchPantries = async () => {
     try {
-      const response = await fetch("http://localhost:3001/api/pantryNames");
-      if (!response.ok) {
-        throw new Error("Failed to fetch pantries");
-      }
-      const data = await response.json();
-      setPantries(data); // Set the pantry names
+      setPantries(await instance.getPantryNames()); // Set the pantry names
     } catch (error) {
       console.error("Error fetching pantries:", error);
     }
@@ -53,25 +45,9 @@ function RecipeGeneratorPage() {
     try {
       //  set on backend
 
-      const response = await fetch(`http://localhost:3001/api/current_pantry`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          pantryName: pantry, // Use the updated pantry name here
-        }),
-      });
+      await instance.setCurrentPantry(pantry);
 
-      if (!response.ok) {
-        throw new Error("Failed to update current pantry");
-      }
-
-      const response2 = await fetch("http://localhost:3001/api/current_pantry");
-      if (!response2.ok) {
-        throw new Error("Failed to fetch pantry data");
-      }
-      const data = await response2.json();
+      data = instance.getCurrentPantry();
       console.log(data);
       setCurrentPantry(data);
       setPantryName(data["name"]);
@@ -83,13 +59,7 @@ function RecipeGeneratorPage() {
 
   const addToPantry = async (ingredient) => {
     try {
-       let curr_pantry = await fetch("http://localhost:3001/api/current_pantry");
-       if (!curr_pantry.ok)
-       {
-        throw new Error("Failed to fetch current pantry");
-       }
-
-       let {pantryName} = await curr_pantry.json();
+       let {pantryName} = await instance.getCurrentPantry();
        
        if (!pantryName) 
        {
@@ -97,23 +67,7 @@ function RecipeGeneratorPage() {
         return;
        }
 
-       let rsp = await fetch("http://localhost:3001/api/store_ingredient", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pantryName,
-          name: ingredient,
-          category: ingredient
-        }),
-      });
-    
-      // Handle the response
-      if (rsp.ok) {
-        console.log(`Ingredient ${ingredient} added successfully.`);
-        // Optionally, update the state or UI to reflect the change
-      } else {
-        console.error(`Failed to add ingredient: ${ingredient}.`);
-      }
+       instance.addIngredient(pantryName, ingredient, ingredient);
     } catch (error) {
       console.error("Error adding ingredient:", error);
     }

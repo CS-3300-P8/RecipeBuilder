@@ -1,6 +1,7 @@
 // IngredientSearchPage.jsx
 import React, { useState } from "react";
 import "./ingredientSearchPage.css";
+import instance from "../utils/PantryMediator.js";
 
 const IngredientSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,12 +87,7 @@ const IngredientSearchPage = () => {
       try {
 
         // Fetch the current pantry from the backend
-        const responseCurrentPantry = await fetch("http://localhost:3001/api/current_pantry");
-        if (!responseCurrentPantry.ok) {
-          throw new Error("Failed to fetch the current pantry");
-        }
-
-        const { pantryName } = await responseCurrentPantry.json();
+        const { pantryName } = await instance.getCurrentPantry();
 
         if (!pantryName) {
           alert("No current pantry is set. Please select a pantry first.");
@@ -99,21 +95,7 @@ const IngredientSearchPage = () => {
         }
 
         // Make a POST request to save the item to the backend
-        const response = await fetch("http://localhost:3001/api/store_ingredient", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            pantryName,
-            name: item.name,
-            category: item.category,
-          }),
-        });
-  
-        if (response.ok) {
-          console.log(`Item ${item.name} added successfully.`);
-        } else {
-          console.error("Failed to save item.");
-        }
+        instance.addIngredient(pantryName, item["name"], item["category"]);
       } catch (error) {
         console.error("Error adding item:", error);
       }
