@@ -115,7 +115,7 @@ const IngredientSearchPage = () => {
           return;
         }
 
-        await instance.addIngredient(pantryName, item["name"], item["category"]);
+        await instance.addIngredient(currentPantry.name, item["name"], item["category"]);
 
         setConfirmationMessage(`${item.name} has been added to your pantry`);
 

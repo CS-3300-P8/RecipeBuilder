@@ -10,7 +10,7 @@ class PantryMediator {
     }
 
     async addPantry(pantry) {
-        const response = await fetch(`${encodeURIComponent(this.api_url)}/api/create_pantry`, {
+        const response = await fetch(`${this.api_url}/api/create_pantry`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -26,7 +26,7 @@ class PantryMediator {
     }
 
     async setCurrentPantry(pantry) {
-        const response = await fetch(`${encodeURIComponent(this.api_url)}/api/current_pantry`, {
+        const response = await fetch(`${this.api_url}/api/current_pantry`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -42,7 +42,7 @@ class PantryMediator {
     }
 
     async getCurrentPantry() {
-        const response = await fetch(`${encodeURIComponent(this.api_url)}/api/current_pantry`);
+        const response = await fetch(`${this.api_url}/api/current_pantry`);
         if (!response.ok) {
             throw new Error("Failed to fetch pantry data");
         }
@@ -51,7 +51,7 @@ class PantryMediator {
     }
 
     async getPantryNames() {
-        const response = await fetch(`${encodeURIComponent(this.api_url)}/api/pantryNames`);
+        const response = await fetch(`${this.api_url}/api/pantryNames`);
         if (!response.ok) {
             throw new Error("Failed to fetch pantry data");
         }
@@ -60,7 +60,7 @@ class PantryMediator {
     }
 
     async getIngredients(pantryName) {
-        const response = await fetch(`${encodeURIComponent(this.api_url)}/api/pantries/${encodeURIComponent(pantryName)}`);
+        const response = await fetch(`${this.api_url}/api/pantries/${encodeURIComponent(pantryName)}`);
         if (!response.ok) {
         throw new Error("Failed to fetch ingredients");
         }
@@ -70,7 +70,7 @@ class PantryMediator {
 
     async deleteIngredient(pantry, ingredient) {
         const response = await fetch(
-            `${encodeURIComponent(this.api_url)}/api/pantries/${encodeURIComponent(pantry)}/ingredients/${encodeURIComponent(ingredient)}`,
+            `${this.api_url}/api/pantries/${encodeURIComponent(pantry)}/ingredients/${encodeURIComponent(ingredient)}`,
             { method: "DELETE" }
         );
         if (!response.ok) {
@@ -79,7 +79,7 @@ class PantryMediator {
     }
 
     async addIngredient(pantry, ingredient, cat) {
-        const response = await fetch(`${encodeURIComponent(this.api_url)}/api/store_ingredient`, {
+        const response = await fetch(`${this.api_url}/api/store_ingredient`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
