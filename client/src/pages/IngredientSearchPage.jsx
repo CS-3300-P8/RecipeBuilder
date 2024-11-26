@@ -83,44 +83,21 @@ const IngredientSearchPage = () => {
   const ResultItem = ({ item }) => {
     const handleAddItem = async () => {
       try {
-        const responseCurrentPantry = await fetch(
-          "http://localhost:3001/api/current_pantry"
-        );
-        if (!responseCurrentPantry.ok) {
-          throw new Error("Failed to fetch the current pantry");
-        }
-
-        const { pantryName } = await responseCurrentPantry.json();
+        const { pantryName } = await instance.getCurrentPantry();
 
         if (!pantryName) {
           alert("No current pantry is set. Please select a pantry first.");
           return;
         }
 
-        const response = await fetch(
-          "http://localhost:3001/api/store_ingredient",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              pantryName,
-              name: item.name,
-              category: item.category,
-            }),
-          }
-        );
+        await instance.addIngredient(pantryName, item["name"], item["category"]);
 
-        if (response.ok) {
-          // Show confirmation message
-          setConfirmationMessage(`${item.name} has been added to your pantry`);
+        setConfirmationMessage(`${item.name} has been added to your pantry`);
 
           // Clear the message after 3 seconds
           setTimeout(() => {
             setConfirmationMessage(null);
           }, 3000);
-        } else {
-          console.error("Failed to save item.");
-        }
       } catch (error) {
         console.error("Error adding item:", error);
       }
