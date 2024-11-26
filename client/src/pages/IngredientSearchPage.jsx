@@ -110,7 +110,16 @@ const IngredientSearchPage = () => {
   const ResultItem = ({ item }) => {
     const handleAddItem = async () => {
       try {
-        if (!currentPantry?.name) {
+        const responseCurrentPantry = await fetch(
+          "http://localhost:3001/api/current_pantry"
+        );
+        if (!responseCurrentPantry.ok) {
+          throw new Error("Failed to fetch the current pantry");
+        }
+
+        const { pantryName } = await responseCurrentPantry.json();
+
+        if (!pantryName) {
           alert("No current pantry is set. Please select a pantry first.");
           return;
         }

@@ -6,6 +6,17 @@ const path = require("path");
 const OpenAI = require("openai");
 const OpenAIServiceFactory = require("./openaiFactory");
 
+const AddIngredientCommand = require("./commands/AddIngredientCommand");
+const UpdateCurrentPantryCommand = require("./commands/UpdateCurrentPantryCommand");
+const RetrieveCurrentPantryCommand = require("./commands/RetrieveCurrentPantryCommand");
+const CreatePantryCommand = require("./commands/CreatePantryCommand");
+const DeleteIngredientCommand = require("./commands/DeleteIngredientCommand");
+const GetAllPantriesCommand = require("./commands/GetAllPantriesCommand");
+const GetIngredientsCommand = require("./commands/GetIngredientsCommand");
+
+const GetPantryNamesCommand = require("./commands/GetPantryNamesCommand");
+
+
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
 let pantrySchema = new mongoose.Schema({
@@ -41,6 +52,9 @@ const openai = new OpenAI({
 });
 
 const openAIServiceFactory = new OpenAIServiceFactory(openai);
+
+module.exports = {Pantry, openAIServiceFactory};
+
 
 // Middleware
 // comment this first line in or out to pull from the build.
@@ -153,37 +167,36 @@ app.post("/api/current_pantry", async (req, res) => {
 
   await Pantry.updateMany({}, { current: false });
 
-  let current_pantries = await Pantry.findOneAndUpdate(
-    { PantryName: pantryName },
-    { current: true },
-    { new: true }
-  );
+  try {
+    const command = new UpdateCurrentPantryCommand(Pantry, pantryName);
+    const updatedPantry = await command.execute();
 
-  if (!current_pantries) {
-    return res.status(404).send({ error: "Pantry not found." });
+    return res.status(200).send({
+      message: `Current pantry updated to '${pantryName}'.`,
+      pantry: updatedPantry,
+    });
+  } catch (error) {
+    return (error); 
   }
-
-  console.log(`Current pantry updated to '${pantryName}'.`);
-  res
-    .status(200)
-    .send({ message: `Current pantry updated to '${pantryName}'.` });
 });
 
 // Endpoint to retrieve the current pantry and its ingredients
 app.get("/api/current_pantry", async (req, res) => {
-  let current_pantries = await Pantry.findOne({ current: true });
-
-  if (!current_pantries) {
-    return res.status(404).send({ error: "No current pantry set." });
+  try {
+    console.log("Getting Current Pantry");
+    const command = new RetrieveCurrentPantryCommand(Pantry);
+    const pantryData = await command.execute();
+    
+    res
+      .status(200)
+      .json({
+        pantryName: pantryData.pantryName,
+        ingredients: pantryData.ingredients,
+      });
+  } catch (error) {
+    console.log("Error in route");
+    return error;
   }
-
-  const ingredients = current_pantries.ingredients || [];
-  res
-    .status(200)
-    .json({
-      pantryName: current_pantries.PantryName,
-      ingredients: current_pantries.ingredients,
-    });
 });
 
 // Endpoint to create a new pantry
@@ -194,11 +207,9 @@ app.post("/api/create_pantry", async (req, res) => {
     return res.status(400).send({ error: "Pantry name is required." });
   }
 
-  if (await Pantry.findOne({ PantryName: pantryName })) {
-    return res.status(400).send({ error: "Pantry already exists." });
-  }
+  const command = new CreatePantryCommand(Pantry, pantryName);
+  await command.execute();
 
-  await Pantry.create({ PantryName: pantryName, ingredients: [] });
   console.log(`Pantry '${pantryName}' created.`);
   res
     .status(200)
@@ -207,6 +218,7 @@ app.post("/api/create_pantry", async (req, res) => {
 
 // Endpoint to add an ingredient to a pantry
 app.post("/api/store_ingredient", async (req, res) => {
+  console.log("Adding Ingredient");
   const { pantryName, name, category } = req.body;
 
   if (!pantryName || !name || !category) {
@@ -217,33 +229,18 @@ app.post("/api/store_ingredient", async (req, res) => {
       });
   }
 
-  let pantry = await Pantry.findOne({ PantryName: pantryName });
-
-  if (!pantry) {
-    return res.status(404).send({ error: "Pantry not found." });
-  }
-
-  let ingredients = pantry.ingredients.find(
-    (ingredient) => ingredient.name.toLowerCase() === name.toLowerCase()
-  );
-
-  if (ingredients) {
-    return res
-      .status(200)
-      .send({
-        message: `Ingredient '${name}' already in pantry '${pantryName}`,
-      });
-  }
-
-  pantry.ingredients.push({ name, category });
-  await pantry.save();
-
-  console.log(`Ingredient '${name}' added to pantry '${pantryName}'.`);
-  res
-    .status(200)
-    .send({
+  try {
+    const command = new AddIngredientCommand(Pantry, pantryName, { name, category });
+    const result = await command.execute();
+    console.log("DONE Adding Ingredient");
+    return res.status(200).send({
       message: `Ingredient '${name}' added successfully to pantry '${pantryName}'.`,
+      pantry: result,
     });
+  } catch (error) {
+    return res.status(400).send({ error: error.message });
+  }
+
 });
 
 // Endpoint to delete an ingredient from a pantry
@@ -258,63 +255,48 @@ app.delete(
         .send({ error: "Pantry name and ingredient name are required." });
     }
 
-    let pantry = await Pantry.findOne({ PantryName: pantryName });
+    try {
+      // Execute the command
+      const command = new DeleteIngredientCommand(Pantry, pantryName, ingredientName);
+      const result = await command.execute();
 
-    if (!pantry) {
-      return res.status(404).send({ error: "Pantry not found." });
-    }
-
-    let ingredientIndex = pantry.ingredients.findIndex(
-      (ingredient) =>
-        ingredient.name.toLowerCase() === ingredientName.toLowerCase()
-    );
-
-    if (ingredientIndex === -1) {
-      return res
-        .status(404)
-        .send({ error: "Ingredient not found in the pantry." });
-    }
-
-    pantry.ingredients.splice(ingredientIndex, 1); // Remove the ingredient
-    await pantry.save();
-
-    res
-      .status(200)
-      .send({
-        message: `Ingredient '${ingredientName}' deleted successfully.`,
+      res.status(200).send({
+        message: "Ingredient Deleted",
+        result,
       });
+    } catch (error) {
+      (error);
+    }
   }
 );
 
-// Endpoint to retrieve all pantries and their ingredients
 app.get("/api/pantries", async (req, res) => {
-  res.json(await Pantry.find());
+  console.log("Getting all pantries");
+  const command = new GetAllPantriesCommand(Pantry);
+  const pantries = await command.execute();
+
+  res.status(200).json(pantries);
 });
 
 // Endpoint to retrieve ingredients of a specific pantry
 app.get("/api/pantries/:pantryName", async (req, res) => {
-  const pantryName = req.params.pantryName;
+  const { pantryName } = req.params;
 
-  if (!pantryName) {
-    return res
-      .status(400)
-      .send({ error: "Pantry name and ingredient name are required." });
+  try {
+    const command = new GetIngredientsCommand(Pantry, pantryName);
+    const ingredients = await command.execute();
+
+    res.status(200).json(ingredients);
+  } catch (error) {
+    res.status(400).send({ error: error.message });
   }
-
-  let pantry = await Pantry.findOne({ PantryName: pantryName });
-
-  if (!pantry) {
-    return res.status(404).send({ error: "Pantry not found." });
-  }
-
-  res.json(pantry.ingredients);
 });
 
-// Endpoint to retrieve the names of all pantries
 app.get("/api/pantryNames", async (req, res) => {
-  res.json(
-    (await Pantry.find({}, "PantryName")).map((pantry) => pantry.PantryName)
-  );
+  const command = new GetPantryNamesCommand(Pantry);
+  const pantryNames = await command.execute();
+
+  res.status(200).json(pantryNames);
 });
 
 initPantry();
