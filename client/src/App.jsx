@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
 import IngredientSearchPage from "./pages/IngredientSearchPage.jsx";
 import VirtualPantry from "./pages/VirtualPantry.jsx";
 import RecipeGeneratorPage from "./pages/RecipeGeneratorPage.jsx";
 
-function NavLink({ to, children }) {
+function NavLink({ to, children, theme }) {
   const location = useLocation();
   const isActive = location.pathname === to;
   
@@ -12,12 +12,14 @@ function NavLink({ to, children }) {
     <Link
       to={to}
       style={{
-        color: isActive ? '#F97316' : '#4B5563',
+        color: isActive ? '#F97316' : theme === 'dark' ? '#D1D5DB' : '#4B5563',
         textDecoration: 'none',
         padding: '0.5rem 1rem',
         borderRadius: '0.5rem',
         fontWeight: '500',
-        backgroundColor: isActive ? '#FFF7ED' : 'transparent',
+        backgroundColor: isActive
+          ? theme === 'dark' ? '#3B3F44' : '#FFF7ED'
+          : 'transparent',
         transition: 'all 0.2s ease-in-out',
       }}
     >
@@ -27,22 +29,40 @@ function NavLink({ to, children }) {
 }
 
 function App() {
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    // Check the system's color scheme.
+    const updateTheme = (e) => {
+      setTheme(e.matches ? 'dark' : 'light');
+    };
+
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    updateTheme(darkModeQuery); // Set the initial theme.
+    darkModeQuery.addEventListener('change', updateTheme); // Listen for changes.
+
+    return () => darkModeQuery.removeEventListener('change', updateTheme);
+  }, []);
+
   return (
     <Router>
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
         padding: '1rem',
+        backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
+        color: theme === 'dark' ? '#F3F4F6' : '#1F2937',
+        minHeight: '100vh',
       }}>
         <header style={{
           marginBottom: '2rem',
-          borderBottom: '1px solid #E5E7EB',
+          borderBottom: `1px solid ${theme === 'dark' ? '#374151' : '#E5E7EB'}`,
           paddingBottom: '1rem',
         }}>
           <h1 style={{
             fontSize: '2rem',
             fontWeight: '700',
-            color: '#fdfbfa',
+            color: theme === 'dark' ? '#F3F4F6' : '#1F2937',
             marginBottom: '1rem',
             display: 'flex',
             alignItems: 'center',
@@ -57,17 +77,20 @@ function App() {
             gap: '1rem',
             alignItems: 'center',
           }}>
-            <NavLink to="/">Virtual Pantry</NavLink>
-            <NavLink to="/ingredient-search">Ingredient Search</NavLink>
-            <NavLink to="/generate-recipe">Generate Recipe</NavLink>
+            <NavLink to="/" theme={theme}>Virtual Pantry</NavLink>
+            <NavLink to="/ingredient-search" theme={theme}>Ingredient Search</NavLink>
+            <NavLink to="/generate-recipe" theme={theme}>Generate Recipe</NavLink>
           </nav>
         </header>
 
         <main style={{
-          background: 'white',
+          background: theme === 'dark' ? '#374151' : '#FFFFFF',
+          color: theme === 'dark' ? '#F3F4F6' : '#1F2937',
           borderRadius: '1rem',
           padding: '2rem',
-          boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+          boxShadow: theme === 'dark'
+            ? '0 1px 3px 0 rgb(0 0 0 / 0.6), 0 1px 2px -1px rgb(0 0 0 / 0.4)'
+            : '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
         }}>
           <Routes>
             <Route path="/" element={<VirtualPantry />} />
@@ -80,7 +103,7 @@ function App() {
           textAlign: 'center',
           padding: '1rem 0',
           fontSize: '0.875rem',
-          color: '#9CA3AF',
+          color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
         }}>
           © {new Date().getFullYear()} Recipe Builder. All rights reserved.
         </footer>
