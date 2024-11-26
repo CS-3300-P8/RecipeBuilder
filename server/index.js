@@ -10,6 +10,7 @@ const AddIngredientCommand = require("./commands/AddIngredientCommand");
 const UpdateCurrentPantryCommand = require("./commands/UpdateCurrentPantryCommand");
 const RetrieveCurrentPantryCommand = require("./commands/RetrieveCurrentPantryCommand");
 const CreatePantryCommand = require("./commands/CreatePantryCommand");
+const DeleteIngredientCommand = require("./commands/DeleteIngredientCommand");
 
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
@@ -248,31 +249,18 @@ app.delete(
         .send({ error: "Pantry name and ingredient name are required." });
     }
 
-    let pantry = await Pantry.findOne({ PantryName: pantryName });
+    try {
+      // Execute the command
+      const command = new DeleteIngredientCommand(Pantry, pantryName, ingredientName);
+      const result = await command.execute();
 
-    if (!pantry) {
-      return res.status(404).send({ error: "Pantry not found." });
-    }
-
-    let ingredientIndex = pantry.ingredients.findIndex(
-      (ingredient) =>
-        ingredient.name.toLowerCase() === ingredientName.toLowerCase()
-    );
-
-    if (ingredientIndex === -1) {
-      return res
-        .status(404)
-        .send({ error: "Ingredient not found in the pantry." });
-    }
-
-    pantry.ingredients.splice(ingredientIndex, 1); // Remove the ingredient
-    await pantry.save();
-
-    res
-      .status(200)
-      .send({
-        message: `Ingredient '${ingredientName}' deleted successfully.`,
+      res.status(200).send({
+        message: "Ingredient Deleted",
+        result,
       });
+    } catch (error) {
+      (error);
+    }
   }
 );
 
