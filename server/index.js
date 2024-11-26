@@ -319,6 +319,8 @@ app.get("/api/pantryNames", async (req, res) => {
 
 initPantry();
 
+module.exports = app;
+
 // Create the web server
 // var server = app.listen(3001, function () {
 //    console.log("Express App running at http://127.0.0.1:3001/");

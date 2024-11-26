@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "chromedriver": "^130.0.0",
-    "openapi": "^1.0.1"
+    "openapi": "^1.0.1",
+    "supertest": "^7.0.0"
   },
   "devDependencies": {
     "@types/selenium-webdriver": "^4.1.27",
