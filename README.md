@@ -3,7 +3,7 @@
 This web application allows users to input ingredients they have at home and receive potential recipes that can be made. If all the ingredients are not available for an exact match, the system suggests "near" recipes and provides AI-powered ingredient substitutions.
 
 ---
-## ** Website Link**
+## **Website Link**
 
 https://client-dot-round-office-437918-e3.ue.r.appspot.com/
 
