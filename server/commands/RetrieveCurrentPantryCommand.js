@@ -9,11 +9,16 @@ class RetrieveCurrentPantryCommand extends BaseCommand {
 
   async execute() {
     try {
-      const currentPantry = await this.model.findOne({ current: true });
+      console.log("Command: Get Curr Pantry");
+      let currentPantry = await this.model.findOne({ current: true });
 
       if (!currentPantry) {
+        console.log("No current pantry set.");
         throw new Error("No current pantry set.");
       }
+
+      console.log("test");
+      console.log(currentPantry);
 
       return {
         pantryName: currentPantry.PantryName,
@@ -21,6 +26,7 @@ class RetrieveCurrentPantryCommand extends BaseCommand {
       };
 
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
