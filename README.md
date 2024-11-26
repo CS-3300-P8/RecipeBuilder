@@ -85,11 +85,11 @@ The following libraries are required:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/recipe-finder.git
+   git clone https://github.com/CS-3300-P8/RecipeBuilder.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd recipe-finder
+   cd RECIPEBUILDER
    ```
 
 ### **Install Dependencies**

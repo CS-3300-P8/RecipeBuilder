@@ -119,7 +119,6 @@
 }
 
 /* Ingredients Section */
-.ingredients-section,
 .instructions-section {
   margin-bottom: 2rem;
 }
@@ -194,3 +193,15 @@
   border-radius: 4px;
   font-size: 0.875rem;
 }
+
+
+.recipe-generator-title {
+  color: #000; /* Default color (black) */
+}
+
+@media (prefers-color-scheme: dark) {
+  .recipe-generator-title {
+    color: #fff; /* Color for dark mode (white) */
+  }
+}
+

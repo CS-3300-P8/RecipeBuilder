@@ -13,6 +13,7 @@ function RecipeGeneratorPage() {
   const [difficulty, setDifficulty] = useState("medium");
   const [style, setStyle] = useState("American");
   const [types, setTypes] = useState("Dinner");
+  const [addedIngredients, setAddedIngredients] = useState(new Set());
 
   useEffect(() => {
     fetchCurrentPantry();
@@ -85,6 +86,7 @@ function RecipeGeneratorPage() {
     }
   };
 
+  // Modify the addToPantry function
   const addToPantry = async (ingredient) => {
     try {
       let { pantryName } = await instance.getCurrentPantry();
@@ -95,6 +97,8 @@ function RecipeGeneratorPage() {
       }
 
       instance.addIngredient(pantryName, ingredient, ingredient);
+
+      setAddedIngredients((prev) => new Set([...prev, ingredient]));
     } catch (error) {
       console.error("Error adding ingredient:", error);
     }
@@ -180,17 +184,18 @@ function RecipeGeneratorPage() {
       }}
     >
       <section>
-        <h2
+        <Card>
+        <h1
           style={{
             fontSize: "1.5rem",
             fontWeight: "600",
             marginBottom: "1rem",
             color: "#1F2937",
+            textAlign: "center",
           }}
         >
           Recipe Generator
-        </h2>
-        <Card>
+        </h1>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
           >
@@ -455,12 +460,16 @@ function RecipeGeneratorPage() {
                           }}
                         >
                           <span style={{ color: "#4B5563" }}>{ingredient}</span>
+                          {/* REPLACE THIS EXISTING BUTTON */}
                           <Button
                             variant="secondary"
                             onClick={() => addToPantry(ingredient)}
                           >
-                            Add to Pantry
+                            {addedIngredients.has(ingredient)
+                              ? "Added ✓"
+                              : "Add to Pantry"}
                           </Button>
+                          {/* END OF REPLACEMENT */}
                         </div>
                       ))}
                     </div>
