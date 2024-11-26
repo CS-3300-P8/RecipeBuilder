@@ -194,6 +194,7 @@
   font-size: 0.875rem;
 }
 
+
 .recipe-generator-title {
   color: #000; /* Default color (black) */
 }
@@ -203,3 +204,4 @@
     color: #fff; /* Color for dark mode (white) */
   }
 }
+

@@ -12,6 +12,7 @@ function RecipeGeneratorPage() {
   const [difficulty, setDifficulty] = useState("medium");
   const [style, setStyle] = useState("American");
   const [types, setTypes] = useState("Dinner");
+  const [addedIngredients, setAddedIngredients] = useState(new Set());
 
   useEffect(() => {
     fetchCurrentPantry();
@@ -116,6 +117,7 @@ function RecipeGeneratorPage() {
     }
   };
 
+  // Modify the addToPantry function
   const addToPantry = async (ingredient) => {
     try {
       let curr_pantry = await fetch("http://localhost:3001/api/current_pantry");
@@ -140,10 +142,9 @@ function RecipeGeneratorPage() {
         }),
       });
 
-      // Handle the response
       if (rsp.ok) {
-        console.log(`Ingredient ${ingredient} added successfully.`);
-        // Optionally, update the state or UI to reflect the change
+        // Add ingredient to the set of added ingredients
+        setAddedIngredients((prev) => new Set([...prev, ingredient]));
       } else {
         console.error(`Failed to add ingredient: ${ingredient}.`);
       }
@@ -508,12 +509,16 @@ function RecipeGeneratorPage() {
                           }}
                         >
                           <span style={{ color: "#4B5563" }}>{ingredient}</span>
+                          {/* REPLACE THIS EXISTING BUTTON */}
                           <Button
                             variant="secondary"
                             onClick={() => addToPantry(ingredient)}
                           >
-                            Add to Pantry
+                            {addedIngredients.has(ingredient)
+                              ? "Added ✓"
+                              : "Add to Pantry"}
                           </Button>
+                          {/* END OF REPLACEMENT */}
                         </div>
                       ))}
                     </div>
