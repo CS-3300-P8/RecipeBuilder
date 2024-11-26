@@ -8,6 +8,7 @@ const OpenAIServiceFactory = require("./openaiFactory");
 
 const AddIngredientCommand = require("./commands/AddIngredientCommand");
 const UpdateCurrentPantryCommand = require("./commands/UpdateCurrentPantryCommand");
+const RetrieveCurrentPantryCommand = require("./commands/RetrieveCurrentPantryCommand");
 
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
@@ -161,7 +162,6 @@ app.post("/api/current_pantry", async (req, res) => {
   await Pantry.updateMany({}, { current: false });
 
   try {
-    // Execute the command
     const command = new UpdateCurrentPantryCommand(Pantry, pantryName);
     const updatedPantry = await command.execute();
 
@@ -176,19 +176,19 @@ app.post("/api/current_pantry", async (req, res) => {
 
 // Endpoint to retrieve the current pantry and its ingredients
 app.get("/api/current_pantry", async (req, res) => {
-  let current_pantries = await Pantry.findOne({ current: true });
-
-  if (!current_pantries) {
-    return res.status(404).send({ error: "No current pantry set." });
+  try {
+    const command = new RetrieveCurrentPantryCommand(Pantry);
+    const pantryData = await command.execute();
+    
+    res
+      .status(200)
+      .json({
+        pantryName: pantryData.PantryName,
+        ingredients: pantryData.ingredients,
+      });
+  } catch (error) {
+    return error;
   }
-
-  const ingredients = current_pantries.ingredients || [];
-  res
-    .status(200)
-    .json({
-      pantryName: current_pantries.PantryName,
-      ingredients: current_pantries.ingredients,
-    });
 });
 
 // Endpoint to create a new pantry
