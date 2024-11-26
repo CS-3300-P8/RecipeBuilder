@@ -357,11 +357,12 @@ function RecipeGeneratorPage() {
                     setStyle(e.target.value);
                   }}
                   options={[
-                    { value: "American", label: "American" },
-                    { value: "Italian", label: "Italian" },
-                    { value: "Mexican", label: "Mexican" },
+                    { value: "North American", label: "North American" },
+                    { value: "African", label: "African"},
                     { value: "Asian", label: "Asian" },
-                    { value: "Mediterranean", label: "Mediterranean" },
+                    { value: "European", label: "European"},
+                    { value: "Oceanian", label: "Oceanian"},
+                    { value: "South American", label: "South American"},
                   ]}
                 />
               </div>
