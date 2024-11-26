@@ -1,5 +1,5 @@
 runtime: nodejs18
-service: default
+service: client
 
 handlers:
   # Serve static files

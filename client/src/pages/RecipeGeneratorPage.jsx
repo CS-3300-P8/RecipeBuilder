@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Button, Input, Select, Card, LoadingSpinner } from "../components/ui";
 import instance from "../utils/PantryMediator.js";
 
+//const PROD_URL = "http://localhost:3001";
+const PROD_URL = "https://round-office-437918-e3.ue.r.appspot.com";
+
 function RecipeGeneratorPage() {
   const [currentPantry, setCurrentPantry] = useState(null);
   const [pantryName, setPantryName] = useState("");
@@ -137,22 +140,19 @@ function RecipeGeneratorPage() {
       console.log(types);
       console.log(difficulty);
 
-      const response = await fetch(
-        "http://localhost:3001/api/generate-recipe",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ingredients: currentPantry.ingredients.map((ing) => ing.name),
-            dietaryRestrictions,
-            style,
-            types,
-            difficulty,
-          }),
-        }
-      );
+      const response = await fetch(PROD_URL + "/api/generate-recipe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ingredients: currentPantry.ingredients.map((ing) => ing.name),
+          dietaryRestrictions,
+          style,
+          types,
+          difficulty,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to generate recipe");
@@ -185,17 +185,17 @@ function RecipeGeneratorPage() {
     >
       <section>
         <Card>
-        <h1
-          style={{
-            fontSize: "1.5rem",
-            fontWeight: "600",
-            marginBottom: "1rem",
-            color: "#1F2937",
-            textAlign: "center",
-          }}
-        >
-          Recipe Generator
-        </h1>
+          <h1
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "600",
+              marginBottom: "1rem",
+              color: "#1F2937",
+              textAlign: "center",
+            }}
+          >
+            Recipe Generator
+          </h1>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
           >

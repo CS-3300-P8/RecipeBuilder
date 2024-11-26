@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import "./ingredientSearchPage.css";
+import "./IngredientSearchPage.css";
 import instance from "../utils/PantryMediator.js";
+
+//const PROD_URL = "http://localhost:3001";
+const PROD_URL = "https://round-office-437918-e3.ue.r.appspot.com";
 
 const IngredientSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,7 +25,7 @@ const IngredientSearchPage = () => {
 
   const fetchCurrentPantry = async () => {
     try {
-      const response = await fetch("http://localhost:3001/api/current_pantry");
+      const response = await fetch(PROD_URL + "/api/current_pantry");
       if (!response.ok) {
         if (response.status === 404) {
           setCurrentPantry(null);
@@ -44,7 +47,7 @@ const IngredientSearchPage = () => {
   const normalizeIngredient = async (query) => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/normalizeIngredient/${query}`
+        PROD_URL + `/api/normalizeIngredient/${query}`
       );
       if (!response.ok) {
         throw new Error("Failed to normalize ingredient");
@@ -124,11 +127,15 @@ const IngredientSearchPage = () => {
           return;
         }
 
-        await instance.addIngredient(currentPantry.name, item["name"], item["category"]);
+        await instance.addIngredient(
+          currentPantry.name,
+          item["name"],
+          item["category"]
+        );
 
         setConfirmationMessage(`${item.name} has been added to your pantry`);
 
-          // Refresh the current pantry to get the updated ingredients
+        // Refresh the current pantry to get the updated ingredients
         await fetchCurrentPantry();
 
         setConfirmationMessage(
@@ -210,7 +217,9 @@ const IngredientSearchPage = () => {
               marginBottom: "1rem",
               color: "#1F2937",
             }}
-          >Find Ingredients</h1>
+          >
+            Find Ingredients
+          </h1>
           <p>Search for ingredients to add to your virtual pantry</p>
           <p className="text-lg">
             {currentPantry ? (

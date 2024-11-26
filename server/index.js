@@ -16,8 +16,12 @@ const GetIngredientsCommand = require("./commands/GetIngredientsCommand");
 
 const GetPantryNamesCommand = require("./commands/GetPantryNamesCommand");
 
-
 const { MongoClient, ServerApiVersion } = require("mongodb");
+
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
 
 let pantrySchema = new mongoose.Schema({
   PantryName: {
@@ -53,8 +57,7 @@ const openai = new OpenAI({
 
 const openAIServiceFactory = new OpenAIServiceFactory(openai);
 
-module.exports = {Pantry, openAIServiceFactory};
-
+module.exports = { Pantry, openAIServiceFactory };
 
 // Middleware
 // comment this first line in or out to pull from the build.
@@ -176,7 +179,7 @@ app.post("/api/current_pantry", async (req, res) => {
       pantry: updatedPantry,
     });
   } catch (error) {
-    return (error); 
+    return error;
   }
 });
 
@@ -186,13 +189,11 @@ app.get("/api/current_pantry", async (req, res) => {
     console.log("Getting Current Pantry");
     const command = new RetrieveCurrentPantryCommand(Pantry);
     const pantryData = await command.execute();
-    
-    res
-      .status(200)
-      .json({
-        pantryName: pantryData.pantryName,
-        ingredients: pantryData.ingredients,
-      });
+
+    res.status(200).json({
+      pantryName: pantryData.pantryName,
+      ingredients: pantryData.ingredients,
+    });
   } catch (error) {
     console.log("Error in route");
     return error;
@@ -222,15 +223,16 @@ app.post("/api/store_ingredient", async (req, res) => {
   const { pantryName, name, category } = req.body;
 
   if (!pantryName || !name || !category) {
-    return res
-      .status(400)
-      .send({
-        error: "Pantry name, ingredient name, and category are required.",
-      });
+    return res.status(400).send({
+      error: "Pantry name, ingredient name, and category are required.",
+    });
   }
 
   try {
-    const command = new AddIngredientCommand(Pantry, pantryName, { name, category });
+    const command = new AddIngredientCommand(Pantry, pantryName, {
+      name,
+      category,
+    });
     const result = await command.execute();
     console.log("DONE Adding Ingredient");
     return res.status(200).send({
@@ -240,7 +242,6 @@ app.post("/api/store_ingredient", async (req, res) => {
   } catch (error) {
     return res.status(400).send({ error: error.message });
   }
-
 });
 
 // Endpoint to delete an ingredient from a pantry
@@ -257,7 +258,11 @@ app.delete(
 
     try {
       // Execute the command
-      const command = new DeleteIngredientCommand(Pantry, pantryName, ingredientName);
+      const command = new DeleteIngredientCommand(
+        Pantry,
+        pantryName,
+        ingredientName
+      );
       const result = await command.execute();
 
       res.status(200).send({
@@ -265,7 +270,7 @@ app.delete(
         result,
       });
     } catch (error) {
-      (error);
+      error;
     }
   }
 );
