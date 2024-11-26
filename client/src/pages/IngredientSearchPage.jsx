@@ -89,18 +89,12 @@ const IngredientSearchPage = () => {
           throw new Error("Failed to fetch the current pantry");
         }
 
-
-
         const { pantryName } = await responseCurrentPantry.json();
-
-        console.log(pantryName);
-
         
         if (!pantryName) {
           alert("No current pantry is set. Please select a pantry first.");
           return;
         }
-
 
         const response = await fetch(
           "http://localhost:3001/api/store_ingredient",
