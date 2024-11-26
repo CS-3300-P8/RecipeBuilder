@@ -204,7 +204,7 @@ const VirtualPantry = () => {
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <h3 style={{ color: "#333" }}>Create a New Pantry</h3>
+        <h3>Create a New Pantry</h3>
         <div
           style={{
             display: "flex",
