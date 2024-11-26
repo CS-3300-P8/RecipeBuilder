@@ -317,6 +317,27 @@ app.get("/api/pantryNames", async (req, res) => {
   );
 });
 
+//Endpoint to delete a pantry
+app.delete("/api/pantries/:pantryName", async (req, res) => {
+  const pantryName = req.params.pantryName;
+
+  if (!pantryName) {
+    return res.status(400).send({ error: "Pantry name is required." });
+  }
+
+  let pantry = await Pantry.findOne({ PantryName: pantryName });
+
+  if (!pantry) {
+    return res.status(404).send({ error: "Pantry not found." });
+  }
+
+  await pantry.deleteOne();
+
+  res
+    .status(200)
+    .send({ message: `Pantry '${pantryName}' deleted successfully.` });
+});
+
 initPantry();
 
 // Create the web server

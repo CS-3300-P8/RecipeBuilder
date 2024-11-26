@@ -109,6 +109,27 @@ const VirtualPantry = () => {
     }
   };
 
+  const handleDeletePantry = async (pantryName) => {
+    if (!pantryName) return;
+
+    try {
+      await instance.deletePantry(pantryName);
+
+      setPantries((prevPantries) =>
+        prevPantries.filter((pantry) => pantry !== pantryName)
+      );
+
+      if (selectedPantry === pantryName) {
+        setSelectedPantry(null);
+        setIngredients([]);
+      }
+
+      console.log(`Pantry '${pantryName}' deleted successfully.`);
+    } catch (error) {
+      console.error("Error deleting Pantry:", error);
+    }
+  };
+
   return (
     <div>
       <div>
@@ -233,6 +254,22 @@ const VirtualPantry = () => {
           </ul>
         ) : (
           <p>Please select a pantry to view its ingredients.</p>
+        )}
+        {/* Add a button to delete the selected pantry */}
+        {selectedPantry && (
+          <button
+            onClick={() => handleDeletePantry(selectedPantry)}
+            style={{
+              backgroundColor: "orange",
+              color: "white",
+              padding: "5px 10px",
+              border: "none",
+              cursor: "pointer",
+              marginTop: "10px",
+            }}
+          >
+            Delete Pantry
+          </button>
         )}
       </div>
     </div>
