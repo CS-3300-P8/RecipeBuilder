@@ -3,6 +3,15 @@ The RecipeBuilder application's concept began as an idea to use the power of GPT
 When we were considering our tech stack, we immediately chose to use React.js again when implementing our frontend, as we were all experienced with it and found it to be easy to use in Project 1. However, frustrations with implementing the backend with Springboot lead us to switch to Node.js and Express.js. We also identified the need for a database technology to store all of our ingredient lists as opposed to static on-server storage within a variable and chose MongoDB. In addition, we had to use the OpenAI API to generate recipes, as well as the Google Cloud Platform to deploy the application.
 # Technologies
 # Requirements
+For this project, we chose four Minimum Marketable Features (MMFs) to focus on, and based the vast majority of our development around polishing these.
+1. An interactive virtual pantry that can list and categorize a user's ingredients.
+This took the form of a page in which users were capable of creating new ingredient lists (pantries), viewing the ingredients within each one, adding and removing ingredients manually, and deleting a pantry itself.
+2. An AI-powered ingredient search that can suggest ingredients based on a user's query.
+This took the form of a page in which users could input the name of an ingredient and receive an AI-generated category for that ingredient as well as three related ingredients.
+3. An AI-powered recipe generator that can derive a recipe from a user's available ingredients.
+This took the form of a page that would send an engineered prompt to the OpenAI API from the backend that would query a recipe using a pantry's ingredients.
+4. An interface to tune a recipe's generation based on dietary restrictions, style, meal type, and difficulty.
+This took the form of several dropdowns on the recipe generation page that would add additional caveats to the engineered prompt on the backend.
 # Design
 # Design Patterns
 ## Factory
