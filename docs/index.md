@@ -7,10 +7,24 @@ When we were considering our tech stack, we immediately chose to use React.js ag
 # Design Patterns
 ## Factory
 The first pattern we decided to implement was the Factory pattern in our backend code. We made this decision when it became apparent that the AI-related code was significantly different from the pantry operations, and was causing a great deal of clutter. It enabled us to delegate the responsibility of handling endpoints that would query the OpenAI API to a specific object, letting the rest of the code focus more on pantry management. It also allowed us to streamline the assembly of API queries. This made the project's backend simpler to manage by way of keeping the focus of each file abundantly clear. If anyone wanted to adjust the AI's prompts, they would know exactly where to look, and would not have to alter the functionality of the base file.
+
+![The factory's internal logic to determine what service to create](factory2.png "The factory's internal logic to determine what service to create")
+
+![The factory being created in the main backend file](factory3.png "The factory being created in the main backend file")
+
+![The API endpoint's use of the factory to generate an executable service](factory4.png "The API endpoint's use of the factory to generate an executable service")
 ## Command
 The next pattern that we implemented was the Command pattern in our backend code. We made this decision when it became apparent that our choice of MongoDB was ill-advised, and any extensions of this project would benefit from a switch to something else. It enabled us to separate our own API's endpoints from the execution of database operations. This meant that if we were to, for example, switch to another database management system or add another type of client with different reasons to perform the same database operation, we would not have to copy code. Instead, we could simply call the commands.
+
+![Importing the commands from a folder into the main backend file](command1.png "Importing the commands from a folder into the main backend file")
+
+![Using one of the commands in an API endpoint](command2.png "Using one of the commands in an API endpoint")
 ## Mediator
 The final pattern to see implementation was the Mediator pattern on the frontend. We observed that if we wanted to alter the API request format on the frontend, we would have to perform shotgun surgery on every single potential request. Instead, we decided to localize these requests to a single mediator object that could be modified alone. This enabled us to modify API requests in one place. We also decided to implement this as a Singleton, as this would allow the class itself to initialize an instance with an environment variable of the expected API endpoint URL, enabling the rest of the code to more or less ignore context switches.
+
+![](mediator1.png)
+
+![](mediator2.png)
 # Testing
 # Challenges/Innovations
 # Outcomes
