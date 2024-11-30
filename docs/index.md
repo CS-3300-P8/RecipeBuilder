@@ -8,7 +8,8 @@ When we were considering our tech stack, we immediately chose to use React.js ag
 When looking at existing implementations of this rough idea, we found many sites implementing the same recipe generation function as we were. In fact, a large part of our choice to add MMF 4, the recipe tuning, was because we saw another site with the same types of options and decided it would be useful for our implementation as well. Our application mainly differs in its ability to store ingredients. The RecipeBuilder's virtual pantries differ from anything any other recipe generator has to offer.
 # Technologies
 # Requirements
-For this project, we chose four Minimum Marketable Features (MMFs) to focus on, and based the vast majority of our development around polishing these.
+## MMFs
+For this project, we chose four Minimum Marketable Features (MMFs) to focus on, and based the vast majority of our development around polishing these. These were the basic features required to implement our application in any usable capacity.
 1. An interactive virtual pantry that can list and categorize a user's ingredients.
 This took the form of a page in which users were capable of creating new ingredient lists (pantries), viewing the ingredients within each one, adding and removing ingredients manually, and deleting a pantry itself.
 2. An AI-powered ingredient search that can suggest ingredients based on a user's query.
@@ -17,6 +18,18 @@ This took the form of a page in which users could input the name of an ingredien
 This took the form of a page that would send an engineered prompt to the OpenAI API from the backend that would query a recipe using a pantry's ingredients.
 4. An interface to tune a recipe's generation based on dietary restrictions, style, meal type, and difficulty.
 This took the form of several dropdowns on the recipe generation page that would add additional caveats to the engineered prompt on the backend.
+
+## NFRs
+Our project was not at a sufficient scale to require a formal consideration of non-functional requirements beyond basic "sanity checks". This meant the process of identifying these came largely down to common sense, and could be accomplished as long as we avoided any egregious inefficiencies in our code.
+* Performance: Direct backend queries should not take more than 100 ms to execute
+* Reliability: Application should be available during demo time
+* Scalability: The project was built to handle one user, and therefore does not scale
+* Compatibility: This application should support all modern browsers and all backend environments through containerization.
+* Capacity: The user data stored in the database will, at most, be 1 MB in total, as text information is highly dense.
+
+Once we had our requirements outlined, we mainly focused on the MMFs, as the NFRs were, as predicted, trivial to meet. However, we had the policy of prioritizing the NFRs, because if they were found to have gone unmet in any version of the code, it indicated a serious issue that needed urgent attention.
+
+In terms of the MMFs, we completed the virtual pantry function first, as the other functions depended strictly on its existence to be implemented in a meaningful way. Once we had completed that, we were free to pursue the second MMF and the combination of the third and fourth in parallel. 
 # Design
 # Design Patterns
 ## Factory
