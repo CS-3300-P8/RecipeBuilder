@@ -44,6 +44,9 @@ In terms of the MMFs, we completed the virtual pantry function first, as the oth
 ## Architecture View
 ![Component Architecture View](Component_Diagram_Project_2.png "Component Architecture View")
 
+## Deployment View
+![Deployment View](DeploymentDiagram.png "Deployment View")
+
 ### Design Motivation
 Our design build on the reliable Client-Server model from Project 1, though includes modifications to address some of the main developmental and usability shortcomings with our Project 1 architecture. These shortcomings center around an encumbered and vulnerable fronted, which created browser issues during the deployment of the site and hindered future development as discrete client-side functionality was highly coupled. As a result, our new architecture is tailored to the implementation specifications of Project 2 and emphasizes maximum user-side usability. 
 
