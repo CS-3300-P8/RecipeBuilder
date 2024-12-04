@@ -69,6 +69,9 @@ The final pattern to see implementation was the Mediator pattern on the frontend
 # Testing
 # Challenges/Innovations
 # Outcomes
+The RecipeBuilder project met its main goal of allowing users to manage virtual pantries and generate recipes based on available ingredients. The testing phase uncovered the strengths and weaknesses of the AI tools used. AI-assisted tools, such as Codeium and Postbot, were instrumental in speeing up test case generation and identifying edge cases overlooked by traditional methods. For example, AI testing yielded higher server-side test coverage (85.21% compared to 65.62% for traditional testing) and identified more issues in less time. However, AI-generated tests often lacked robustness in covering all edge cases and required manual intervention to align test cases with API functionality.
+
+Despite achieving 100% coverage in black-box testing, the AI approach faced challenges like difficulty generating variations of specific test requests and dependency on pre-implemented functionality. On the other hand, traditional methods showed superior alignment with edge case handling but were time-intensive. Overall, combining traditional and AI-enhanced approaches provided a balanced testing framework, ensuring functional requirements were met and offering peeks into future testing optimization.
 # Future Direction
 Future enhancements to the RecipeBuilder project could include expanding the ingredient dataset to cater to a wider variety of cuisines and dietary restrictions, thus increasing the system's reach. Integrating more advanced AI tools, such as GPT style models fine tuned for recipe generation, could significantly improve the system’s ability to handle ambiguous inputs and generate creative suggestions. Additionally, incorporating real-time feedback mechanisms and error handling for invalid inputs would elevate user experience.
 
