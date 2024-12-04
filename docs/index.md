@@ -70,3 +70,6 @@ The final pattern to see implementation was the Mediator pattern on the frontend
 # Challenges/Innovations
 # Outcomes
 # Future Direction
+Future enhancements to the RecipeBuilder project could include expanding the ingredient dataset to cater to a wider variety of cuisines and dietary restrictions, thus increasing the system's reach. Integrating more advanced AI tools, such as GPT style models fine tuned for recipe generation, could significantly improve the system’s ability to handle ambiguous inputs and generate creative suggestions. Additionally, incorporating real-time feedback mechanisms and error handling for invalid inputs would elevate user experience.
+
+Research opportunities also exist in optimizing the ingredient-to-recipe mapping algorithm for faster performance and scalability. Exploring alternative AI tool like graph-based recommendation systems could yield better results. Finally, deploying the system with multilingual support would make it accessible to a global audience adding to its reach and expanding its user base.
