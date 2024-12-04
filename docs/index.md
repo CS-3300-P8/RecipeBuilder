@@ -303,6 +303,35 @@ The final pattern to see implementation was the Mediator pattern on the frontend
 
 
 # Challenges/Innovations
+## Challenges
+**Prompt Engineering, Fine Tuning**
+ -	Challenge: To create a well-functioning Recipe and Ingredient Generator, a meticulously crafted prompt must be constructed to ensure consistently correct output.
+ -	Solution: Over iterations of development and testing, we created a prompt that organized instructions into parts: Role, Input, Parameters, Output, Format, Special Notes. This organization is broken into two separate messages: (1) System, which defines the behavior of the model, (2) User, which represents the user query of inputs.
+     -	Role: We begin the prompt by defining a role that the model will use to give a theme to its answers. In a form of role-playing, our supplied role provides a definitive purpose for the model.
+     -	Input: We next detail the system to regard only user queries relating to ingredients/recipe characteristics. This ensures that the model bases its response on the input, and does not hallucinate based on non-input information.
+     -	Output: We define the objective of the model as a series of requirements. This offers the model some flexibility to create a multitude of responses while also meeting the needs of the user. 
+     -	Format: We list out the format that the model should use to detail its response. This format helps the developer utilize a consistent output style for further processing in code.
+     -	Special Notes: To reduce hallucination by the model, we reinforce the requirements of the output and further define any potentially ambiguous portion of the prompt.
+
+**First Iteration of Pantry Management**
+ -	Challenge: Concurrent development among members meant that the implementation of the Pantry would proceed the implementation of backend database, thus there is not a feasible way to store items to validate Pantry Implementation. 
+ -	Solution: We developed a preliminary 2D Vector to organize pantries and their ingredients. We could leverage Javascript’s native vector functionality to dynamically grow a list of pantries and their ingredients during runtime. This allowed for the development of the frontend VirtualPantry page and the backend route handler logic before our implementation of MongoDB. This also the added benefit of generally resembling the MongoDB library, which likewise had functions to find, remove, and add. When finally integrating MongoDB into our implementation, we were able to model the Database’s schema to resemble the structure of the 2D vector: Dynamic entries in the databased were organized by Pantry ID, with each entry possessing a vector of ingredients.
+
+**Supertest and Jest for testing Routing Logic**
+ -	Challenge: Since we are using Javascript for development, we cannot use Junit for unit test creation. Also, we want to test the routing functionality in our backend. However, a static unit test may not be suitable as it does not run the express engine to run the routing operations.
+ -	Solution: We found that we can use the Jest unit test framework to implement Javascript testing. Also, the Supertest library provided by npm handles the testing of routing logic during static code testing. 
+ -	Highlight unique technological or methodological approaches that distinguished your project.
+
+## Innovations
+The distinct trait of the project is its organization, both in style of the implementation and in the engineering of the prompts we supply to OpenAI for Recipe and Ingredient generation. 
+
+**Prompt Engineering**
+-	As previously mentioned in the above challenges section, our prompt is organized to take input information supplied from the routed frontend UI and create a tailored response. This allows the end-user to modify the results they receive from the generation while still within the frame of recipe creation (or ingredient generation). Because of the explicit directions that the model receives from our prompt, the divergence of results from the parameters (difficulty, restrictions, style) supplied is minimized. 
+
+**Modular Code**
+- As previously mentioned in the above challenges section, the code is highly modulated. Extensive care was place in separating distinct functionalities by an abstracted interface (frontend separated from backend by mediator, backend separated from database from executable commands). This adherence to a reconfigurability in our methodology supports future development and offers future developers the ability to integrate the codebase into other applications with minimal developmental overhead.
+
+
 # Outcomes
 The RecipeBuilder project met its main goal of allowing users to manage virtual pantries and generate recipes based on available ingredients. The testing phase uncovered the strengths and weaknesses of the AI tools used. AI-assisted tools, such as Codeium and Postbot, were instrumental in speeing up test case generation and identifying edge cases overlooked by traditional methods. For example, AI testing yielded higher server-side test coverage (85.21% compared to 65.62% for traditional testing) and identified more issues in less time. However, AI-generated tests often lacked robustness in covering all edge cases and required manual intervention to align test cases with API functionality.
 
