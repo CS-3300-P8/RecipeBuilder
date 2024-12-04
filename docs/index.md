@@ -8,13 +8,13 @@ When we were considering our tech stack, we immediately chose to use React.js ag
 When looking at existing implementations of this rough idea, we found many sites implementing the same recipe generation function as we were. In fact, a large part of our choice to add MMF 4, the recipe tuning, was because we saw another site with the same types of options and decided it would be useful for our implementation as well. Our application mainly differs in its ability to store ingredients. The RecipeBuilder's virtual pantries differ from anything any other recipe generator has to offer.
 
 # Technologies
-### Tech Stack
+## Tech Stack
 The RecipeBuilder project utilized a strong technology stack designed to balance functionality, scalability, and user experience. Key technologies included React for the frontend, providing a responsive and interactive user interface, and Node.js for the backend, ensuring fast and efficient server-side operations. The project employed MongoDB as the database for flexible and scalable data storage, ideal for managing complex ingredient and recipe data. Deployment was handled through Google Cloud Platform (GCP) to ensure reliable hosting and seamless scalability. Version control was maintained using GitHub, facilitating collaboration and efficient project management.
 
-### AI Integration
+## AI Integration
 For AI integration, tools like Codeium and Postbot were selected to streamline development and testing processes. Codeium was employed for white-box testing, leveraging its automated test case generation and debugging capabilities, which significantly reduced the time spent on manual test creation. Postbot was used for black-box API testing, automating response validation and regression testing. These tools were chosen based on their proven ability to enhance productivity and coverage in previous projects. Additionally, the team incorporated design patterns such as Singleton for managing database connections, Factory for dynamic object creation, and Observer for event handling, ensuring adherence to software engineering best practices.
 
-### Rationale
+## Rationale
 The rationale for selecting these technologies and tools centered on their compatibility with project requirements and their potential to increase learning results. React and Node.js provided a seamless development experience, while MongoDB’s flexibility supported the dynamic nature of ingredient and recipe data. The AI tools, particularly Codeium, were chosen for their ability to identify gaps in traditional testing methods and improve efficiency, aligning with the project’s goal of integrating advanced software engineering techniques. This combination of technologies and design patterns ensured a robust and maintainable solution.
 
 # Requirements
